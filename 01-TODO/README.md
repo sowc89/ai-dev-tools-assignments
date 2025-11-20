@@ -2,6 +2,12 @@
 
 ## Using AI Tools and building a TODO application in DJango
 
+This todo application has the following features: 
+    Create, edit and delete TODOs
+    Assign due dates
+    Mark TODOs as resolved
+    Set Reminders
+
 ### Installing DJango, with AI's assistance (Using Github Copilot with GPT-5 mini)
 
 Prompt:  I would like to install Django in my windows 11 machine.
@@ -20,9 +26,9 @@ python -m django --version
 deactivate
 ```
 
-## Using AI tools to build a TODO application in Django
+### Using AI tools to build a TODO application in Django
 
-This repository contains a small Django TODO application (project: `todo_site`, app: `tasks`) scaffolded with guidance from an AI assistant. It includes a DRF API, a reminder processor (management command), an in-process scheduler for development, and a minimal React + Vite SPA for interacting with the API.
+This repository contains a small Django TODO application (project: `todo_site`, app: `tasks`) scaffolded with guidance from an AI assistant. It includes a DRF API, a reminder processor (management command), an in-process scheduler for development, and a minimal django frontend as well as a minimal React + Vite SPA for interacting with the API.
 
 Prerequisites
 
@@ -83,7 +89,7 @@ Where to look
 - Admin: `http://127.0.0.1:8000/admin/`
 - API root: `http://127.0.0.1:8000/api/`
 - Tasks endpoint: `http://127.0.0.1:8000/api/tasks/`
-- Static minimal SPA (served by Django): `http://127.0.0.1:8000/frontend/`
+- Minimal SPA (served by Django): `http://127.0.0.1:8000/frontend/`
 
 Scheduler and database notes
 
@@ -111,6 +117,7 @@ git push -u origin feature/todo-scheduler
 Running Tests
 
 Use the command
+
 
 ```python manage.py test ```
 

@@ -4,18 +4,264 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>TODO SPA (minimal)</title>
+    <style>
+      body { font-family: Arial, Helvetica, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 12px; }
+      header { display:flex; align-items:center; justify-content:space-between }
+      form { margin: 12px 0; display:flex; gap:8px; flex-wrap:wrap; }
+      input[type=text], input[type=datetime-local], textarea, select { padding:6px; border:1px solid #ccc; border-radius:4px; }
+      button { padding:6px 10px; border-radius:4px; border:1px solid #888; background:#f4f4f4; cursor:pointer }
+      button.primary { background:#0b84ff; color:white; border-color:#0b6fe0 }
+      .task { border:1px solid #e0e0e0; padding:10px; margin:8px 0; border-radius:6px; display:flex; justify-content:space-between; gap:10px }
+      .meta { color:#666; font-size:0.9em }
+      .controls button { margin-left:6px }
+      .completed { opacity:0.6; text-decoration:line-through }
+      .small { font-size:0.9em }
+      .error { color:crimson }
+    </style>
   </head>
   <body>
-    <h1>TODO SPA (minimal)</h1>
-    <p>This is a minimal static entry showing how to call the API.</p>
-    <pre id="out">Loading...</pre>
+    <header>
+      <h1>TODO (minimal SPA)</h1>
+      <div class="small">API: <code>/api/tasks/</code></div>
+    </header>
+
+    <section id="status" class="small"></section>
+
+    <section>
+      <h2>Create / Edit Task</h2>
+      <form id="task-form">
+        <input type="hidden" id="task-id" />
+        <input id="title" type="text" placeholder="Title" required />
+        <input id="due_date" type="datetime-local" />
+        <select id="category_id"><option value="">-- category --</option></select>
+        <input id="reminder_at" type="datetime-local" title="Reminder time (optional)" />
+        <button type="submit" class="primary">Save</button>
+        <button type="button" id="reset">Reset</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Tasks</h2>
+      <div id="tasks-list">Loading…</div>
+    </section>
+
     <script>
-      async function fetchTasks(){
-        const res = await fetch('/api/tasks/');
-        const data = await res.json();
-        document.getElementById('out').textContent = JSON.stringify(data, null, 2);
+      // Helper: convert ISO datetime to local `datetime-local` input value
+      function isoToLocalInput(iso) {
+        if (!iso) return '';
+        const d = new Date(iso);
+        // remove seconds and milliseconds for nicer inputs
+        const pad = n => String(n).padStart(2, '0');
+        const local = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        return local;
       }
-      fetchTasks().catch(e=>document.getElementById('out').textContent = e);
+
+      function inputToIso(value) {
+        if (!value) return null;
+        const d = new Date(value);
+        return d.toISOString();
+      }
+
+      const apiRoot = '/api/tasks/';
+      const catRoot = '/api/categories/';
+      const statusEl = document.getElementById('status');
+
+      // Read a cookie by name (for CSRF token)
+      function getCookie(name) {
+        const parts = document.cookie.split(';').map(c => c.trim());
+        for (const p of parts) {
+          if (p.startsWith(name + '=')) return decodeURIComponent(p.split('=')[1]);
+        }
+        return null;
+      }
+
+      async function fetchJSON(url, opts = {}) {
+        opts = Object.assign({}, opts);
+        opts.headers = Object.assign({}, opts.headers || {});
+        const method = (opts.method || 'GET').toUpperCase();
+        // Include CSRF token for unsafe methods and send cookies
+        if (method !== 'GET' && method !== 'HEAD') {
+          const csrftoken = getCookie('csrftoken');
+          if (csrftoken) opts.headers['X-CSRFToken'] = csrftoken;
+        }
+        // Ensure cookies are sent for same-origin requests so CSRF cookie is available
+        opts.credentials = opts.credentials || 'same-origin';
+
+        const res = await fetch(url, opts);
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`${res.status} ${res.statusText}: ${text}`);
+        }
+        return res.status === 204 ? null : res.json();
+      }
+
+      async function loadCategories() {
+        try {
+          const data = await fetchJSON(catRoot);
+          const sel = document.getElementById('category_id');
+          sel.innerHTML = '<option value="">-- category --</option>';
+          data.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.name;
+            sel.appendChild(opt);
+          });
+        } catch (e) {
+          statusEl.innerHTML = '<span class="error">Failed loading categories: '+e.message+'</span>';
+        }
+      }
+
+      async function loadTasks() {
+        try {
+          statusEl.textContent = 'Loading tasks...';
+          const data = await fetchJSON(apiRoot);
+          renderTasks(data);
+          statusEl.textContent = '';
+        } catch (e) {
+          statusEl.innerHTML = '<span class="error">Failed loading tasks: '+e.message+'</span>';
+        }
+      }
+
+      function renderTasks(tasks) {
+        const container = document.getElementById('tasks-list');
+        container.innerHTML = '';
+        if (tasks.length === 0) {
+          container.textContent = 'No tasks yet.';
+          return;
+        }
+
+        tasks.forEach(task => {
+          const el = document.createElement('div');
+          el.className = 'task' + (task.completed ? ' completed' : '');
+          const left = document.createElement('div');
+          left.style.flex = '1';
+          const title = document.createElement('div');
+          title.textContent = task.title;
+          const desc = document.createElement('div');
+          desc.textContent = task.description || '';
+          desc.className = 'meta';
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          const parts = [];
+          if (task.category) parts.push(task.category.name);
+          if (task.due_date) parts.push('Due: ' + new Date(task.due_date).toLocaleString());
+          if (task.reminder_at) parts.push('Reminder: ' + new Date(task.reminder_at).toLocaleString());
+          meta.textContent = parts.join(' · ');
+          left.appendChild(title);
+          left.appendChild(desc);
+          left.appendChild(meta);
+
+          const controls = document.createElement('div');
+          controls.className = 'controls';
+          // Complete / reopen
+          const completeBtn = document.createElement('button');
+          completeBtn.textContent = task.completed ? 'Reopen' : 'Complete';
+          completeBtn.onclick = () => toggleComplete(task.id);
+          controls.appendChild(completeBtn);
+
+          const editBtn = document.createElement('button');
+          editBtn.textContent = 'Edit';
+          editBtn.onclick = () => fillFormForEdit(task);
+          controls.appendChild(editBtn);
+
+          const delBtn = document.createElement('button');
+          delBtn.textContent = 'Delete';
+          delBtn.onclick = () => deleteTask(task.id);
+          controls.appendChild(delBtn);
+
+          el.appendChild(left);
+          el.appendChild(controls);
+          container.appendChild(el);
+        });
+      }
+
+      async function createOrUpdateTask(ev) {
+        ev.preventDefault();
+        const id = document.getElementById('task-id').value;
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description') ? document.getElementById('description').value : '';
+        const category_id = document.getElementById('category_id').value || null;
+        const due_date_input = document.getElementById('due_date').value;
+        const reminder_input = document.getElementById('reminder_at').value;
+
+        if (!title) { alert('Title is required'); return; }
+
+        const payload = {
+          title,
+          description,
+          category_id: category_id || null,
+          due_date: inputToIso(due_date_input),
+          reminder_at: inputToIso(reminder_input),
+        };
+
+        try {
+          if (id) {
+            await fetchJSON(apiRoot + id + '/', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+            statusEl.textContent = 'Updated task.';
+          } else {
+            await fetchJSON(apiRoot, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+            statusEl.textContent = 'Created task.';
+          }
+          resetForm();
+          loadTasks();
+        } catch (e) {
+          statusEl.innerHTML = '<span class="error">Save failed: '+e.message+'</span>';
+        }
+      }
+
+      function resetForm() {
+        document.getElementById('task-id').value = '';
+        document.getElementById('title').value = '';
+        if (document.getElementById('description')) document.getElementById('description').value = '';
+        document.getElementById('due_date').value = '';
+        document.getElementById('reminder_at').value = '';
+        document.getElementById('category_id').value = '';
+      }
+
+      function fillFormForEdit(task) {
+        document.getElementById('task-id').value = task.id;
+        document.getElementById('title').value = task.title;
+        // create description field if missing
+        if (!document.getElementById('description')) {
+          const ta = document.createElement('textarea');
+          ta.id = 'description';
+          ta.placeholder = 'Description';
+          ta.rows = 2;
+          const form = document.getElementById('task-form');
+          form.insertBefore(ta, form.children[3]);
+        }
+        document.getElementById('description').value = task.description || '';
+        document.getElementById('due_date').value = isoToLocalInput(task.due_date);
+        document.getElementById('reminder_at').value = isoToLocalInput(task.reminder_at);
+        document.getElementById('category_id').value = task.category ? task.category.id : '';
+      }
+
+      async function deleteTask(id) {
+        if (!confirm('Delete this task?')) return;
+        try {
+          await fetchJSON(apiRoot + id + '/', { method: 'DELETE' });
+          statusEl.textContent = 'Deleted.';
+          loadTasks();
+        } catch (e) {
+          statusEl.innerHTML = '<span class="error">Delete failed: '+e.message+'</span>';
+        }
+      }
+
+      async function toggleComplete(id) {
+        try {
+          await fetchJSON(apiRoot + id + '/complete/', { method: 'POST' });
+          loadTasks();
+        } catch (e) {
+          statusEl.innerHTML = '<span class="error">Complete failed: '+e.message+'</span>';
+        }
+      }
+
+      document.getElementById('task-form').addEventListener('submit', createOrUpdateTask);
+      document.getElementById('reset').addEventListener('click', resetForm);
+
+      // Init
+      loadCategories();
+      loadTasks();
     </script>
   </body>
 </html>
