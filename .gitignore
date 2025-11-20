@@ -1,2 +1,54 @@
 venv/
 .venv
+01-TODO/todo_site/db.sqlite3
+01-TODO/todo_site/db.sqlite3-shm
+01-TODO/todo_site/db.sqlite3-wal
+
+# Byte-compiled / cached / test artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.pytest_cache/
+.mypy_cache/
+
+# Django
+*.log
+local_settings.py
+media/
+staticfiles/
+# collectstatic output (if you use it)
+static/
+
+# Environment / secrets
+.env
+.env.*
+env/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# Node / frontend
+node_modules/
+frontend-spa/node_modules/
+frontend-spa/dist/
+frontend-spa/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+
+# Coverage
+.coverage
+htmlcov/

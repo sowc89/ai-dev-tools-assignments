@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>TODO SPA (minimal)</title>
+  </head>
+  <body>
+    <h1>TODO SPA (minimal)</h1>
+    <p>This is a minimal static entry showing how to call the API.</p>
+    <pre id="out">Loading...</pre>
+    <script>
+      async function fetchTasks(){
+        const res = await fetch('/api/tasks/');
+        const data = await res.json();
+        document.getElementById('out').textContent = JSON.stringify(data, null, 2);
+      }
+      fetchTasks().catch(e=>document.getElementById('out').textContent = e);
+    </script>
+  </body>
+</html>
