@@ -108,6 +108,12 @@ git commit -m "Add TODO app scaffold, scheduler, and SPA"
 git push -u origin feature/todo-scheduler
 ```
 
+Running Tests
+
+Use the command
+
+```python manage.py test ```
+
 Security & production
 
 - Do not run with `DEBUG=True` in production. Use proper secrets management for SMTP credentials and other environment variables. For real email delivery, configure Django's email backend and store credentials in environment variables or a secrets manager.
