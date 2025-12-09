@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: coding-interview-app
+    env: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001

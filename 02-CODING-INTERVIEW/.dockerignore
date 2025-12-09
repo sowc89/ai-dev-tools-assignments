@@ -1,0 +1,35 @@
+# Node modules
+node_modules
+npm-debug.log
+
+# Frontend
+frontend/node_modules
+frontend/dist
+frontend/.vite
+
+# Backend
+backend/node_modules
+backend/tests
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.local
+
+# Documentation
+README.md
+*.md
+
+# Artifacts
+.gemini
