@@ -7,5 +7,10 @@ export const initSocket = () => {
         timeout: 10000,
         transports: ['websocket'],
     };
-    return io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001', options);
+
+    // In production (Render), use the same domain. In dev, use localhost:3001
+    const socketUrl = import.meta.env.VITE_BACKEND_URL ||
+        (window.location.hostname === 'localhost' ? 'http://localhost:3001' : window.location.origin);
+
+    return io(socketUrl, options);
 };

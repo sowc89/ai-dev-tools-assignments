@@ -128,7 +128,10 @@ const EditorPage = () => {
                 }
             } else {
                 // Use Piston API for other languages
-                const { data } = await axios.post(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'}/execute`, {
+                const apiUrl = import.meta.env.VITE_BACKEND_URL ||
+                    (window.location.hostname === 'localhost' ? 'http://localhost:3001' : window.location.origin);
+
+                const { data } = await axios.post(`${apiUrl}/execute`, {
                     code: codeRef.current,
                     language,
                 });
