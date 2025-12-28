@@ -4,6 +4,8 @@ venv/
 01-TODO/todo_site/db.sqlite3-shm
 01-TODO/todo_site/db.sqlite3-wal
 
+03-MCP/search/data
+
 # Byte-compiled / cached / test artifacts
 __pycache__/
 *.py[cod]
