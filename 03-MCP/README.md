@@ -67,7 +67,52 @@ The easiest way to test the tools is using the built-in MCP Inspector.
     - Enter a URL, e.g., "https://example.com".
     - Run it to see the fetched content.
 
+
+## Integration with MCP Clients (VS Code / AI Assistant)
+
+To use this server with an MCP-compliant client (like Claude Desktop, dedicated VS Code extensions, or AI assistants), you need to add it to your configuration file.
+
+### Configuration
+
+Add the following entry to your MCP `config.json` (e.g., `claude_desktop_config.json`):
+
+**Using `uv`:**
+
+```json
+{
+  "mcpServers": {
+    "demo-search": {
+      "command": "uv",
+      "args": [
+        "run",
+        "fastmcp",
+        "run",
+        "path/to/03-MCP/main.py"
+      ]
+    }
+  }
+}
+```
+
+**Using standard python:**
+
+```json
+{
+  "mcpServers": {
+    "demo-search": {
+      "command": "path/to/03-MCP/.venv/Scripts/python",
+      "args": [
+        "path/to/03-MCP/main.py"
+      ]
+    }
+  }
+}
+```
+
+*Note: Replace `path/to/03-MCP` with the absolute path to the directory on your machine.*
+
 ## Project Structure
+
 
 - `main.py`: The entry point for the MCP server.
 - `search/`: Contains the search implementation.
