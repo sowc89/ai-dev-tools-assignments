@@ -11,6 +11,8 @@ An intelligent flashcard application that helps students study more effectively.
 - **Feedback Loop**: Rate and refine AI-generated cards to improve quality.
 - **Modern UI**: Clean, responsive interface built with React and Tailwind CSS.
 
+The app is deployed to Render and can be accessed at https://flashcard-ai-app.onrender.com
+
 ## Tech Stack
 
 ![App Screenshot](image.png)
