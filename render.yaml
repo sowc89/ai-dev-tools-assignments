@@ -13,7 +13,7 @@ services:
     rootContext: 01-PROJECT-FLASHCARDS/backend
 
   # Frontend Static Site
-  - type: static
+  - type: static_site
     name: flashcards-frontend
     env: static
     buildCommand: npm run build
