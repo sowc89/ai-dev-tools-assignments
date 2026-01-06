@@ -5,10 +5,12 @@ on:
     branches: [ main ]
     paths:
       - '01-PROJECT-FLASHCARDS/**'
+      - '.github/workflows/**'
   pull_request:
     branches: [ main ]
     paths:
       - '01-PROJECT-FLASHCARDS/**'
+      - '.github/workflows/**'
 
 jobs:
   backend-tests:
@@ -35,7 +37,7 @@ jobs:
           python -m pytest --cov=app --cov-report=term-missing | tee coverage.txt
           echo "## Backend Coverage Report" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          grep -A 100 "Name " coverage.txt >> $GITHUB_STEP_SUMMARY
+          grep -A 100 "Name " coverage.txt >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           
   frontend-tests:
