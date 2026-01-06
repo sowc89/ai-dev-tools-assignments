@@ -58,12 +58,15 @@ jobs:
           npm ci
           
       - name: Run Tests
+        env:
+          CI: true
         run: |
           cd 01-PROJECT-FLASHCARDS/frontend
           npm test -- --run --coverage | tee coverage_frontend.txt
           echo "## Frontend Coverage Report" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          grep -A 100 "-------" coverage_frontend.txt >> $GITHUB_STEP_SUMMARY || true
+          # Extract the table starting from the header line
+          sed -n '/File\s*|/,$p' coverage_frontend.txt >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           
       - name: Build Check
