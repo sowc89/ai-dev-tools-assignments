@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getDecks, createDeck } from '../api';
+import { getDecks, createDeck, deleteDeck } from '../api';
 import { Plus, BookOpen, Trash2, PlayCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -32,6 +32,22 @@ function DeckList() {
             loadDecks();
         } catch (error) {
             console.error("Failed to create deck", error);
+        }
+    };
+
+    const handleDeleteDeck = async (id, e) => {
+        // Prevent clicking the delete button from navigating to the deck view
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (window.confirm("Are you sure you want to delete this deck and all its cards? This action cannot be undone.")) {
+            try {
+                await deleteDeck(id);
+                loadDecks();
+            } catch (error) {
+                console.error("Failed to delete deck", error);
+                alert("Failed to delete deck. Please try again.");
+            }
         }
     };
 
@@ -115,6 +131,13 @@ function DeckList() {
                                 </div>
                             </div>
                         </Link>
+                        <button
+                            onClick={(e) => handleDeleteDeck(deck.id, e)}
+                            className="absolute top-6 right-6 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                            title="Delete Deck"
+                        >
+                            <Trash2 size={18} />
+                        </button>
                         <Link
                             to={`/decks/${deck.id}/study`}
                             className="absolute bottom-6 right-6 p-2 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-100 hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
