@@ -10,4 +10,4 @@ services:
         sync: false
       - key: DATABASE_URL
         value: sqlite:///database.db
-    rootContext: 01-PROJECT-FLASHCARDS
+    rootDir: 01-PROJECT-FLASHCARDS
