@@ -60,3 +60,15 @@ jobs:
         run: |
           cd 01-PROJECT-FLASHCARDS/frontend
           npm run build
+
+  deploy:
+    name: Deploy to Render
+    needs: [backend-tests, frontend-tests]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Trigger Render Deploy Hook
+        # This will only run if both test jobs pass
+        shell: bash
+        run: |
+          curl -f -X GET "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"

@@ -12,3 +12,6 @@ fastmcp
 mcp
 pydantic-ai
 nest-asyncio
+passlib[bcrypt]
+bcrypt==3.2.0
+python-jose[cryptography]

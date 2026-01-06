@@ -11,28 +11,10 @@ sqlite_file_name = "test_integration.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 engine = create_engine(sqlite_url, connect_args={"check_same_thread": False})
 
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
-
-def get_session_override():
-    with Session(engine) as session:
-        yield session
-
-app.dependency_overrides[get_session] = get_session_override
-client = TestClient(app)
-
-@pytest.fixture(name="session")
-def session_fixture():
-    create_db_and_tables()
-    with Session(engine) as session:
-        yield session
-    # Cleanup
-    SQLModel.metadata.drop_all(engine)
-
-def test_full_user_flow(session: Session):
+def test_full_user_flow(client: TestClient, auth_headers: dict):
     # 1. Create a Deck
     deck_data = {"name": "Integration Test Deck", "description": "Testing full flow"}
-    response = client.post("/decks/", json=deck_data)
+    response = client.post("/decks/", json=deck_data, headers=auth_headers)
     assert response.status_code == 200
     deck = response.json()
     deck_id = deck["id"]
@@ -40,37 +22,37 @@ def test_full_user_flow(session: Session):
 
     # 2. Add Cards Manually
     card_data = {"front": "What is 2+2?", "back": "4", "deck_id": deck_id}
-    response = client.post("/cards/", json=card_data)
+    response = client.post("/cards/", json=card_data, headers=auth_headers)
     assert response.status_code == 200
     
     # 3. Add Study Notes
     notes_update = {"notes": "Remember to study math."}
-    response = client.put(f"/decks/{deck_id}", json=notes_update)
+    response = client.put(f"/decks/{deck_id}", json=notes_update, headers=auth_headers)
     assert response.status_code == 200
     assert response.json()["notes"] == "Remember to study math."
 
     # 4. Verify Deck Content
-    response = client.get(f"/decks/{deck_id}")
+    response = client.get(f"/decks/{deck_id}", headers=auth_headers)
     assert response.status_code == 200
     data = response.json()
     assert data["notes"] == "Remember to study math."
 
     # 5. Delete a Card
     # First get the card ID
-    response = client.get(f"/decks/{deck_id}/cards")
+    response = client.get(f"/decks/{deck_id}/cards", headers=auth_headers)
     cards = response.json()
     assert len(cards) == 1
     card_id = cards[0]["id"]
 
-    response = client.delete(f"/cards/{card_id}")
+    response = client.delete(f"/cards/{card_id}", headers=auth_headers)
     assert response.status_code == 200
 
     # Verify card is gone
-    response = client.get(f"/decks/{deck_id}/cards")
+    response = client.get(f"/decks/{deck_id}/cards", headers=auth_headers)
     assert response.json() == []
 
 @patch("app.main.FlashcardAgent")
-def test_ai_generation_flow(mock_agent_class, session: Session):
+def test_ai_generation_flow(mock_agent_class, client: TestClient):
     # Mocking Agent Response
     mock_agent_instance = MagicMock()
     # Define what the async method should return
@@ -100,7 +82,7 @@ def test_ai_generation_flow(mock_agent_class, session: Session):
         assert data["source_text"] == "Source Text"
 
 @patch("app.main.FlashcardAgent")
-def test_refine_flow(mock_agent_class, session: Session):
+def test_refine_flow(mock_agent_class, client: TestClient):
     # Mocking Agent Response
     mock_agent_instance = MagicMock()
     from unittest.mock import AsyncMock

@@ -4,10 +4,30 @@ const API_URL = 'http://localhost:8000';
 
 export const api = axios.create({
     baseURL: API_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
 });
+
+// Add a request interceptor to include the JWT token
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+// Auth API
+export const loginUser = async (username, password) => {
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('password', password);
+    const response = await api.post('/token', formData);
+    return response.data;
+};
+
+export const registerUser = async (username, password, email) => {
+    const response = await api.post('/register', { username, password, email });
+    return response.data;
+};
 
 export const getDecks = async () => {
     const response = await api.get('/decks/');
@@ -59,7 +79,11 @@ export const generateCards = async (file, startPage = 1, endPage = -1) => {
     formData.append('file', file);
     formData.append('start_page', startPage);
     formData.append('end_page', endPage);
-    const response = await axios.post(`${API_URL}/generate`, formData);
+    const response = await api.post('/generate', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
     return response.data;
 };
 
@@ -69,6 +93,6 @@ export const refineCards = async (currentCards, sourceText, feedback) => {
         source_text: sourceText,
         feedback: feedback
     };
-    const response = await axios.post(`${API_URL}/generate/refine`, payload);
+    const response = await api.post('/generate/refine', payload);
     return response.data;
 };

@@ -26,3 +26,19 @@ def client_fixture(session: Session):
     client = TestClient(app)
     yield client
     app.dependency_overrides.clear()
+
+@pytest.fixture(name="auth_headers")
+def auth_headers_fixture(client: TestClient):
+    # Register a test user
+    client.post("/register", json={
+        "username": "testuser",
+        "password": "testpassword",
+        "email": "test@example.com"
+    })
+    # Login to get token
+    response = client.post("/token", data={
+        "username": "testuser",
+        "password": "testpassword"
+    })
+    token = response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}

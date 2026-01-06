@@ -16,4 +16,8 @@ The above prompt created the mcp server using FastMCP and also enabled the AI ag
 
 ```Prompt: In the Generate using AI functionality, can we add a user input option like chapter or the pages for which the user wants the flashcards generated and a feedback loop where the Agent waits for the user to give a thumbs up or share a feedback for improved flashcards```
 
-Had some back and forth to make the LLM call the mcp server as a tool to extract data from pdf and generate flashcards. 
+Had some back and forth to make the LLM call the mcp server as a tool to extract data from pdf and generate flashcards. Finally, to implement CI/CD workflow, I used the following prompt:
+
+```prompt: I am planning to setup CI/CD for this flashcards project.. what are the different ways we can do this? I might be deploying this app to Render or some free tier cloud deployment.```
+
+This generated ci.yml and render.yaml files. Then I asked the application to be dockerised using the multistage dockerfile. 
