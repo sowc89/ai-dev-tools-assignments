@@ -18,6 +18,7 @@ vi.mock('../api', () => ({
 
 describe('App Component', () => {
     it('renders without crashing', () => {
+        localStorage.setItem('isAuthenticated', 'true');
         api.getDecks.mockResolvedValue([]);
         render(<App />);
         // Smoke test passed if render doesn't throw

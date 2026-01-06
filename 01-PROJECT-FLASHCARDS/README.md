@@ -4,6 +4,8 @@ An intelligent flashcard application that helps students study more effectively.
 
 ## Features
 
+- **Secure Authentication**: User registration and login powered by JWT (JSON Web Tokens) and bcrypt password hashing.
+- **User Data Isolation**: Multi-user support ensuring users only see and manage their own flashcard decks.
 - **AI-Powered Generation**: Upload PDF documents to automatically generate flashcards using Google Gemini Flash.
 - **Study Mode**: Interactive study mode with flip animations and navigation.
 - **Deck Management**: Create, organize, and manage multiple flashcard decks.
@@ -22,17 +24,18 @@ AI Agent uses the MCP server to extract the pdf text. It is to avoid overloading
 ### Frontend
 - **Framework**: React 18 with Vite
 - **Styling**: Tailwind CSS
-- **Routing**: React Router DOM (with Nginx fallback)
+- **Routing**: React Router DOM (with AuthGuard & Nginx fallback)
 - **HTTP Client**: Axios
-- **Testing**: Vitest, React Testing Library
+- **Testing**: Vitest, React Testing Library, @vitest/coverage-v8
 
 ### Backend
 - **Framework**: FastAPI
 - **Database**: SQLite with SQLModel (ORM)
+- **Authentication**: JWT (python-jose), Password Hashing (passlib/bcrypt)
 - **AI**: Google Gemini API (via `google-generativeai`)
 - **MCP Server**: FastMCP (for PDF text extraction)
 - **PDF Processing**: pypdf
-- **Testing**: Pytest, TestClient, pytest-asyncio
+- **Testing**: Pytest, TestClient, pytest-asyncio, pytest-cov
 
 ### Infrastructure & CI/CD
 - **Containerization**: Docker (Multi-stage build)
@@ -79,6 +82,7 @@ Configure Environment Variables:
 Create a `.env` file in the `backend` directory:
 ```env
 GOOGLE_API_KEY=your_gemini_api_key_here
+SECRET_KEY=your_jwt_secret_key_here # For token generation
 DATABASE_URL=sqlite:///database.db # Optional, defaults to this if not set
 ```
 
@@ -128,13 +132,13 @@ The application will run at `http://localhost:5173`.
 ### Backend Tests
 ```bash
 cd backend
-python -m pytest
+python -m pytest --cov=app --cov-report=term-missing
 ```
 
 ### Frontend Tests
 ```bash
 cd frontend
-npm test
+npm test -- --coverage
 ```
 
 ## Deployment & CI/CD
@@ -143,6 +147,7 @@ npm test
 The project includes a CI pipeline that runs on every push and pull request to the `main` branch.
 - **Location**: `.github/workflows/flashcards-ci.yml` (Repository Root)
 - **Checks**: Backend tests, Frontend tests, and Linting.
+- **Code Coverage**: Automaticaly reports test coverage metrics in the CI logs (aiming for high quality and isolation).
 - **Gated Deployment**: If all tests pass and the branch is `main`, GitHub automatically triggers a deployment to Render via a Deploy Hook.
 
 **Important Note for Success-only Deployment:**
@@ -175,8 +180,7 @@ Any github commit triggers CI using Github actions and also trigger the deployme
 
 *Note: While a manual Web Service is used, the repository still includes a `render.yaml` for optional Blueprint-based deployment.*
 
-## Verified Test Suites
-
-Both the backend and frontend have comprehensive test suites ensuring reliability:
-- **Backend**: 13 tests (Unit & Integration) covering AI generation, refinement, and CRUD operations.
-- **Frontend**: 11 tests covering Study Mode, Deck View, and AI UI flows.
+Both the backend and frontend have comprehensive test suites ensuring reliability and security:
+- **Backend**: 16 tests covering AI generation, refinement, CRUD operations, and **Strict Security Isolation**.
+- **Frontend**: 18 tests covering Login flow, Auth Guards, Study Mode, and AI UI flows.
+- **Overall Coverage**: Tracked automatically in CI via `pytest-cov` and `vitest`.
