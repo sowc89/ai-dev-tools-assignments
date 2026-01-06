@@ -20,4 +20,7 @@ Had some back and forth to make the LLM call the mcp server as a tool to extract
 
 ```prompt: I am planning to setup CI/CD for this flashcards project.. what are the different ways we can do this? I might be deploying this app to Render or some free tier cloud deployment.```
 
-This generated ci.yml and render.yaml files. Then I asked the application to be dockerised using the multistage dockerfile. 
+This generated ci.yml and render.yaml files. Then I asked the application to be dockerised using the multistage dockerfile. Once the app deployment succeeded, the user login implementation got added using the prompt: 
+
+
+```prompt: We have to add a functionality to enable user login/signup with a username/email and password```
