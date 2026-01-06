@@ -2,11 +2,9 @@
 
 An intelligent flashcard application that helps students study more effectively. It features AI-powered deck generation from PDFs, enabling users to instantly create study materials from their notes or textbooks.
 
-![App Screenshot](image.png)
-
 ## Features
 
-- **AI-Powered Generation**: Upload PDF documents (including handwritten notes) to automatically generate flashcards using Google Gemini 1.5 Flash.
+- **AI-Powered Generation**: Upload PDF documents to automatically generate flashcards using Google Gemini Flash.
 - **Study Mode**: Interactive study mode with flip animations and navigation.
 - **Deck Management**: Create, organize, and manage multiple flashcard decks.
 - **Feedback Loop**: Rate and refine AI-generated cards to improve quality.
@@ -14,6 +12,9 @@ An intelligent flashcard application that helps students study more effectively.
 
 ## Tech Stack
 
+![App Screenshot](image.png)
+
+AI Agent uses the MCP server to extract the pdf text. It is to avoid overloading the LLM with large pdfs. Also, later if another pdf extraction tool or documents of other formats have to be supported, it can be done easily by just changing the MCP server.
 
 ### Frontendp
 - **Framework**: React 18 with Vite

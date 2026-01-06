@@ -16,3 +16,4 @@ The above prompt created the mcp server using FastMCP and also enabled the AI ag
 
 ```Prompt: In the Generate using AI functionality, can we add a user input option like chapter or the pages for which the user wants the flashcards generated and a feedback loop where the Agent waits for the user to give a thumbs up or share a feedback for improved flashcards```
 
+Had some back and forth to make the LLM call the mcp server as a tool to extract data from pdf and generate flashcards. 
