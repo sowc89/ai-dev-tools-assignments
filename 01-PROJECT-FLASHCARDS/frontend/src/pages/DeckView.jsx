@@ -338,28 +338,57 @@ function DeckView() {
                 )
             }
 
-            <div className="space-y-4">
-                {cards.map((card) => (
-                    <div key={card.id} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
-                        <div className="flex-1">
-                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Front</h4>
-                            <p className="text-lg text-slate-800">{card.front}</p>
+            <div className="space-y-8">
+                {['New', 'Revise', 'All Done'].map((status) => {
+                    const filteredCards = cards.filter(card => card.status === status || (!card.status && status === 'New'));
+                    if (filteredCards.length === 0) return null;
+
+                    return (
+                        <div key={status} className="space-y-4">
+                            <div className="flex items-center gap-2 mb-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-widest px-3 py-1 rounded-full ${status === 'New' ? 'bg-rose-100 text-rose-600' :
+                                        status === 'Revise' ? 'bg-orange-100 text-orange-600' :
+                                            'bg-emerald-100 text-emerald-600'
+                                    }`}>
+                                    {status}
+                                </h3>
+                                <div className="flex-1 h-px bg-slate-100"></div>
+                                <span className="text-xs font-bold text-slate-400">{filteredCards.length} cards</span>
+                            </div>
+
+                            <div className="space-y-4">
+                                {filteredCards.map((card) => (
+                                    <div key={card.id} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow relative overflow-hidden">
+                                        {/* Status Strip */}
+                                        <div className={`absolute top-0 left-0 w-1 h-full ${status === 'New' ? 'bg-rose-400' :
+                                                status === 'Revise' ? 'bg-orange-400' :
+                                                    'bg-emerald-400'
+                                            }`} />
+
+                                        <div className="flex-1">
+                                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Front</h4>
+                                            <p className="text-lg text-slate-800">{card.front}</p>
+                                        </div>
+                                        <div className="hidden md:block w-px bg-slate-100"></div>
+                                        <div className="flex-1">
+                                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Back</h4>
+                                            <p className="text-lg text-slate-800">{card.back}</p>
+                                        </div>
+                                        <div className="flex items-start">
+                                            <button
+                                                onClick={() => handleDeleteCard(card.id)}
+                                                className="text-slate-400 hover:text-red-500 transition-colors p-2"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <div className="hidden md:block w-px bg-slate-100"></div>
-                        <div className="flex-1">
-                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Back</h4>
-                            <p className="text-lg text-slate-800">{card.back}</p>
-                        </div>
-                        <div className="flex items-start">
-                            <button
-                                onClick={() => handleDeleteCard(card.id)}
-                                className="text-slate-400 hover:text-red-500 transition-colors p-2"
-                            >
-                                <Trash2 size={18} />
-                            </button>
-                        </div>
-                    </div>
-                ))}
+                    );
+                })}
+
                 {cards.length === 0 && (
                     <div className="text-center py-12 text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-300">
                         <p>No cards in this deck yet.</p>

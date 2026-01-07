@@ -20,7 +20,7 @@ function Navbar() {
         <nav className="bg-white border-b border-slate-200 px-6 py-4 mb-6">
             <div className="max-w-4xl mx-auto flex items-center justify-between">
                 <Link to="/" className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                    Flashcards AI
+                    StudyPal
                 </Link>
                 {isAuthenticated && (
                     <button

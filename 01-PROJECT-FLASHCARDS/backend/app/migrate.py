@@ -25,6 +25,30 @@ def migrate():
         else:
             print("user_id column already exists in deck table.")
 
+        # 2. Check for status in card table
+        cursor.execute("PRAGMA table_info(card)")
+        columns = [column[1] for column in cursor.fetchall()]
+        
+        if "status" not in columns:
+            print("Adding status column to card table...")
+            cursor.execute("ALTER TABLE card ADD COLUMN status TEXT DEFAULT 'New'")
+            conn.commit()
+            print("Successfully added status column.")
+        else:
+            print("status column already exists in card table.")
+
+        # 3. Check for tags in deck table
+        cursor.execute("PRAGMA table_info(deck)")
+        columns = [column[1] for column in cursor.fetchall()]
+        
+        if "tags" not in columns:
+            print("Adding tags column to deck table...")
+            cursor.execute("ALTER TABLE deck ADD COLUMN tags TEXT DEFAULT ''")
+            conn.commit()
+            print("Successfully added tags column.")
+        else:
+            print("tags column already exists in deck table.")
+
         conn.close()
     except Exception as e:
         print(f"Migration failed: {e}")

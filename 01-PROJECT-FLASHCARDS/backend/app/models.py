@@ -32,6 +32,7 @@ class TokenData(SQLModel):
 class DeckBase(SQLModel):
     name: str = Field(index=True)
     description: Optional[str] = None
+    tags: Optional[str] = Field(default="")
 
 class Deck(DeckBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -57,11 +58,13 @@ class DeckUpdate(SQLModel):
     name: Optional[str] = None
     description: Optional[str] = None
     notes: Optional[str] = None
+    tags: Optional[str] = None
 
 # Card Model
 class CardBase(SQLModel):
     front: str
     back: str
+    status: str = Field(default="New")
     deck_id: Optional[int] = Field(default=None, foreign_key="deck.id")
 
 class Card(CardBase, table=True):
@@ -81,6 +84,7 @@ class CardRead(CardBase):
 class CardUpdate(SQLModel):
     front: Optional[str] = None
     back: Optional[str] = None
+    status: Optional[str] = None
 
 # AI Models
 class GenerateResponse(SQLModel):
