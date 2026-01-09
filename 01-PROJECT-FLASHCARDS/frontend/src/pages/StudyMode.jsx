@@ -124,14 +124,14 @@ function StudyMode() {
 
                                     {currentCard.status && (
                                         <span className={`absolute top-6 right-6 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tighter ${currentCard.status === 'New' ? 'bg-rose-100 text-rose-600' :
-                                                currentCard.status === 'Revise' ? 'bg-orange-100 text-orange-600' :
-                                                    'bg-emerald-100 text-emerald-600'
+                                            currentCard.status === 'Revise' ? 'bg-orange-100 text-orange-600' :
+                                                'bg-emerald-100 text-emerald-600'
                                             }`}>
                                             {currentCard.status}
                                         </span>
                                     )}
 
-                                    <p className="text-2xl md:text-3xl text-slate-800 text-center font-medium leading-relaxed">
+                                    <p className="text-xl sm:text-2xl md:text-3xl text-slate-800 text-center font-medium leading-relaxed">
                                         {currentCard.front}
                                     </p>
                                     <div className="absolute bottom-6 text-slate-400 text-sm flex items-center gap-2">
@@ -145,14 +145,14 @@ function StudyMode() {
 
                                     {currentCard.status && (
                                         <span className={`absolute top-6 right-6 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tighter ${currentCard.status === 'New' ? 'bg-rose-200 text-rose-700' :
-                                                currentCard.status === 'Revise' ? 'bg-orange-200 text-orange-700' :
-                                                    'bg-emerald-200 text-emerald-700'
+                                            currentCard.status === 'Revise' ? 'bg-orange-200 text-orange-700' :
+                                                'bg-emerald-200 text-emerald-700'
                                             }`}>
                                             {currentCard.status}
                                         </span>
                                     )}
 
-                                    <p className="text-2xl md:text-3xl text-indigo-900 text-center leading-relaxed">
+                                    <p className="text-xl sm:text-2xl md:text-3xl text-indigo-900 text-center leading-relaxed">
                                         {currentCard.back}
                                     </p>
                                 </div>
@@ -160,19 +160,19 @@ function StudyMode() {
                         </div>
 
                         {/* Status Selection */}
-                        <div className="flex items-center justify-center gap-4 mt-8">
+                        <div className="flex items-center justify-center gap-2 sm:gap-4 mt-8">
                             <button
                                 onClick={() => handleStatusChange('New')}
-                                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currentCard.status === 'New'
-                                        ? 'bg-rose-100 text-rose-700 ring-2 ring-rose-300'
-                                        : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'
+                                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${currentCard.status === 'New'
+                                    ? 'bg-rose-100 text-rose-700 ring-2 ring-rose-300'
+                                    : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'
                                     }`}
                             >
                                 New
                             </button>
                             <button
                                 onClick={() => handleStatusChange('Revise')}
-                                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currentCard.status === 'Revise'
+                                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${currentCard.status === 'Revise'
                                     ? 'bg-orange-100 text-orange-700 ring-2 ring-orange-300'
                                     : 'text-slate-400 hover:bg-orange-50 hover:text-orange-600'
                                     }`}
@@ -181,12 +181,42 @@ function StudyMode() {
                             </button>
                             <button
                                 onClick={() => handleStatusChange('All Done')}
-                                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currentCard.status === 'All Done'
+                                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${currentCard.status === 'All Done'
                                     ? 'bg-emerald-100 text-emerald-700 ring-2 ring-emerald-300'
                                     : 'text-slate-400 hover:bg-emerald-50 hover:text-emerald-600'
                                     }`}
                             >
                                 All Done
+                            </button>
+                        </div>
+
+                        {/* Navigation Controls - Moved here for better mobile flow */}
+                        <div className="flex items-center justify-center gap-4 sm:gap-8 py-6 sm:py-8 mt-4 border-t border-slate-100 lg:border-none">
+                            <button
+                                onClick={handlePrev}
+                                disabled={currentIndex === 0}
+                                aria-label="Previous card"
+                                className="p-3 sm:p-4 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <ChevronLeft size={20} className="sm:hidden" />
+                                <ChevronLeft size={24} className="hidden sm:block" />
+                            </button>
+
+                            <button
+                                onClick={handleFlip}
+                                className="flex-1 sm:flex-none px-6 sm:px-12 py-3 sm:py-4 bg-indigo-600 text-white rounded-full font-bold shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all text-sm sm:text-lg whitespace-nowrap"
+                            >
+                                {isFlipped ? 'Show Question' : 'Show Answer'}
+                            </button>
+
+                            <button
+                                onClick={handleNext}
+                                disabled={currentIndex === cards.length - 1}
+                                aria-label="Next card"
+                                className="p-3 sm:p-4 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <ChevronRight size={20} className="sm:hidden" />
+                                <ChevronRight size={24} className="hidden sm:block" />
                             </button>
                         </div>
                     </div>
@@ -212,38 +242,6 @@ function StudyMode() {
                         />
                         <p className="text-xs text-slate-400 mt-2">Notes are saved to this deck.</p>
                     </div>
-                </div>
-
-                {/* Bottom Row: Controls - Aligned to Flashcard Column */}
-                <div className="flex flex-col lg:flex-row gap-8">
-                    <div className="w-full lg:w-2/3 flex items-center justify-center gap-8 py-4">
-                        <button
-                            onClick={handlePrev}
-                            disabled={currentIndex === 0}
-                            aria-label="Previous card"
-                            className="p-4 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <ChevronLeft size={24} />
-                        </button>
-
-                        <button
-                            onClick={handleFlip}
-                            className="px-12 py-4 bg-indigo-600 text-white rounded-full font-bold shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all text-lg"
-                        >
-                            {isFlipped ? 'Show Question' : 'Show Answer'}
-                        </button>
-
-                        <button
-                            onClick={handleNext}
-                            disabled={currentIndex === cards.length - 1}
-                            aria-label="Next card"
-                            className="p-4 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <ChevronRight size={24} />
-                        </button>
-                    </div>
-                    {/* Spacer to match Notes column width */}
-                    <div className="hidden lg:block lg:w-1/3"></div>
                 </div>
             </div>
         </div>

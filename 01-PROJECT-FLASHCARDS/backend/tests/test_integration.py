@@ -56,12 +56,10 @@ def test_full_user_flow(client: TestClient, auth_headers: dict):
     assert response.json() == []
 
 @patch("app.main.FlashcardAgent")
-def test_ai_generation_flow(mock_agent_class, client: TestClient):
+def test_ai_generation_flow(mock_agent_class, client: TestClient, auth_headers: dict):
     # Mocking Agent Response
     mock_agent_instance = MagicMock()
     # Define what the async method should return
-    # Since it's async, we should ideally mock an awaitable, 
-    # but unittest.mock.AsyncMock is better for python 3.8+
     from unittest.mock import AsyncMock
     mock_agent_instance.generate_from_pdf = AsyncMock(return_value=(
         [{"front": "AI Question", "back": "AI Answer"}],
@@ -73,9 +71,8 @@ def test_ai_generation_flow(mock_agent_class, client: TestClient):
     files = {'file': ('test.pdf', b'%PDF-1.4 dummy content', 'application/pdf')}
     
     # 2. Call Generate Endpoint
-    # We need to set a dummy API key because FlashcardAgent.__init__ checks it
     with patch.dict(os.environ, {"GOOGLE_API_KEY": "dummy_key"}):
-        response = client.post("/generate", files=files)
+        response = client.post("/generate", files=files, headers=auth_headers)
         
         assert response.status_code == 200
         data = response.json()
@@ -86,7 +83,7 @@ def test_ai_generation_flow(mock_agent_class, client: TestClient):
         assert data["source_text"] == "Source Text"
 
 @patch("app.main.FlashcardAgent")
-def test_refine_flow(mock_agent_class, client: TestClient):
+def test_refine_flow(mock_agent_class, client: TestClient, auth_headers: dict):
     # Mocking Agent Response
     mock_agent_instance = MagicMock()
     from unittest.mock import AsyncMock
@@ -102,7 +99,7 @@ def test_refine_flow(mock_agent_class, client: TestClient):
         "feedback": "Make it better"
     }
     
-    response = client.post("/generate/refine", json=refine_data)
+    response = client.post("/generate/refine", json=refine_data, headers=auth_headers)
     
     assert response.status_code == 200
     refined_cards = response.json()

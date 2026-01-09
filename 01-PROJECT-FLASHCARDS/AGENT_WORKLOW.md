@@ -1,6 +1,28 @@
 ##Project workflow using the AI tools
 
-The project was developed using the Google Antigravity editor and its AI coding assistant. I used the following init prompt to start the project and refine it with more usecases and tests along the way.
+The project was developed using the Google Antigravity editor and its AI coding assistant. To demonstrate the MCP capabilities, I found a multimodel code reviewer tool (https://lobehub.com/mcp/igor-safonov-git-code-review-mcp?activeTab=deployment) which is a fastmcp server that can be ran locally. I ran this tool and configured it as an MCP server in the Antigravity editor. Configuration file looks like this: 
+
+```json
+{
+    "mcpServers": {
+        "code-review-mcp": {
+            "command": "python",
+            "args": [
+                "-m",
+                "code_review_mcp.server"
+            ]
+        }
+    },
+    "inputs": []
+}
+```
+
+
+
+
+
+
+I used the following init prompt to start the project and refine it with more usecases and tests along the way.
 
 ```Init Prompt: I am planning to build a flashcards app. The app will allow the users to create their own flashcards, categorise them or use an AI Agent to create the custom flashcards by uploading the text as pdf. Then they can view the flashcards. Flashcards can have two sides: questions on one side and answer on the other. My front end technology can be ReactJS and Backend based on Python.. We can use sqllite db for now, but it should be extendable to other databases like postgres later. Also we need to add OpenAPI specs for the backend APIs. Let us create a plan to initialize a project based on these requirements.. ```
 
@@ -24,3 +46,29 @@ This generated ci.yml and render.yaml files. Then I asked the application to be 
 
 
 ```prompt: We have to add a functionality to enable user login/signup with a username/email and password```
+
+Once the user login got implemented, I asked the AI coding assistant to add the user isolation feature to the application. I used the following prompt to add the user isolation feature to the application.
+
+```prompt: We have to add a functionality to save the decks created by the user in their own account and not in the global account.```
+
+I wanted to make sure the deployment happened after the CI in github actions succeeded.So I prompted the AI assistant to modify the github actions workflow to deploy only when the CI tests pass.
+
+```prompt: I want to make sure the deployment happens after the CI in github actions succeeds.```
+
+After that, I went on to add coverage metrics and displaying the coverage metrics in the Github Actions. 
+
+```prompt: I want to add coverage metrics and displaying the coverage metrics in the Github Actions.```
+
+Once that succeeded,I proceeded to add some more functionality improvements. I wanted to categorise the cards inside a deck based on the user's study progress. I used the following prompt to add the categorisation feature to the application.
+
+```prompt: Lets add a new functionality. Categories to group the cards. Revise, All Done, New.. The user should be able to add cards to these categories and also move cards between categories. Show the cards grouped by category in the view cards page as well.```
+
+Once that was done, I asked the AI coding assistant to add the deck tagging feature to the application. I used the following prompt to add the deck tagging feature to the application.
+
+```prompt: Now, lets add an abiltiy to add tags to the Card Decks and an ability to filter by tags. Make sure to add edit tags capability as well.```
+
+Post that, used the below prompt for some mobile improvements. 
+
+```prompt: In the card deck, the icons have to be displayed on hover, or some kind of usability improvement so the mobile user can find the study session, delete, edit icons easily ```
+
+While doing all these, I made sure to prompt the AI assistant to include tests for all the new features as well. 

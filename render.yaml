@@ -10,4 +10,6 @@ services:
         sync: false
       - key: DATABASE_URL
         value: sqlite:///database.db
+      - key: ALLOWED_ORIGINS
+        sync: false # Set this in the Render dashboard after deployment
     rootDir: 01-PROJECT-FLASHCARDS

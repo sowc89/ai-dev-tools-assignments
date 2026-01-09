@@ -47,10 +47,20 @@ app = FastAPI(
 )
 
 # Configure CORS
+# Read allowed origins from environment variable (comma-separated)
+# If not provided, default to wildcard for development (requires allow_credentials=False for browser compatibility)
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS")
+if allowed_origins_env:
+    origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+    allow_credentials = True
+else:
+    origins = ["*"]
+    allow_credentials = False
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, replace with frontend URL
-    allow_credentials=True,
+    allow_origins=origins, 
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -209,7 +219,8 @@ def delete_card(card_id: int, session: Session = Depends(get_session), current_u
 async def generate_cards(
     file: UploadFile = File(...),
     start_page: int = Form(1),
-    end_page: int = Form(-1)
+    end_page: int = Form(-1),
+    current_user: User = Depends(get_current_user)
 ):
     print(f"DEBUG: Received file: {file.filename}, Pages: {start_page}-{end_page}")
     if not file.filename.lower().endswith('.pdf'):
@@ -233,7 +244,7 @@ async def generate_cards(
         raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")
 
 @app.post("/generate/refine", response_model=List[CardCreate])
-async def refine_cards(request: RefineRequest):
+async def refine_cards(request: RefineRequest, current_user: User = Depends(get_current_user)):
     try:
         agent = FlashcardAgent()
         new_cards = await agent.refine_flashcards(request.cards, request.source_text, request.feedback)
