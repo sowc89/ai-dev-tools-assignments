@@ -12,4 +12,6 @@ services:
         value: sqlite:///database.db
       - key: ALLOWED_ORIGINS
         sync: false # Set this in the Render dashboard after deployment
+      - key: SECRET_KEY
+        generateValue: true
     rootDir: 01-PROJECT-FLASHCARDS
