@@ -13,8 +13,8 @@ vi.mock('../api', () => ({
 
 const mockDeck = { id: 1, name: 'Test Deck', description: 'Test Desc', notes: 'Initial notes' };
 const mockCards = [
-    { id: 1, front: 'Question 1', back: 'Answer 1', deck_id: 1 },
-    { id: 2, front: 'Question 2', back: 'Answer 2', deck_id: 1 },
+    { id: 1, front: 'Question 1', back: 'Answer 1', status: 'New', deck_id: 1 },
+    { id: 2, front: 'Question 2', back: 'Answer 2', status: 'Revise', deck_id: 1 },
 ];
 
 describe('StudyMode Component', () => {

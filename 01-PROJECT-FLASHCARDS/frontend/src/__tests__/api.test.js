@@ -39,4 +39,35 @@ describe('API functions', () => {
         expect(api.post).toHaveBeenCalledWith('/decks/', newDeck);
         expect(result).toEqual(responseData);
     });
+
+    it('handles 401 errors by clearing storage and redirecting', async () => {
+        // Access the interceptor's error handler
+        const interceptor = api.interceptors.response.use.mock.calls[0];
+        const errorHandler = interceptor[1];
+
+        const mockError = {
+            response: { status: 401 }
+        };
+
+        // Mock window.location.href
+        const originalLocation = window.location;
+        delete window.location;
+        window.location = { href: '' };
+
+        localStorage.setItem('token', 'stale');
+        localStorage.setItem('isAuthenticated', 'true');
+
+        try {
+            await errorHandler(mockError);
+        } catch (e) {
+            // Error is re-thrown by interceptor
+        }
+
+        expect(localStorage.getItem('token')).toBeNull();
+        expect(localStorage.getItem('isAuthenticated')).toBeNull();
+        expect(window.location.href).toBe('/login');
+
+        // Restore window.location
+        window.location = originalLocation;
+    });
 });

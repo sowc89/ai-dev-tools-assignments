@@ -16,6 +16,21 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+// Add a response interceptor to handle 401 Unauthorized errors
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            // Clear authentication state
+            localStorage.removeItem('token');
+            localStorage.removeItem('isAuthenticated');
+            // Redirect to login page
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
+
 // Auth API
 export const loginUser = async (username, password) => {
     const formData = new FormData();

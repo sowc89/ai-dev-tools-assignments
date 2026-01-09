@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDecks, createDeck, deleteDeck, updateDeck } from '../api';
 import { Plus, BookOpen, Trash2, PlayCircle, Pencil, X, Check, Search } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function DeckList() {
     const [decks, setDecks] = useState([]);
@@ -14,6 +14,7 @@ function DeckList() {
     const [editName, setEditName] = useState('');
     const [editDesc, setEditDesc] = useState('');
     const [editTags, setEditTags] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         loadDecks();
@@ -194,10 +195,13 @@ function DeckList() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredDecks.map((deck) => (
                     <div key={deck.id} className="group relative">
-                        <Link to={`/decks/${deck.id}`} className="block h-full">
+                        <div
+                            onClick={() => editingDeckId !== deck.id && navigate(`/decks/${deck.id}`)}
+                            className="block h-full cursor-pointer"
+                        >
                             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow group-hover:border-indigo-300 h-full flex flex-col justify-between">
                                 {editingDeckId === deck.id ? (
-                                    <div className="space-y-3" onClick={(e) => e.preventDefault()}>
+                                    <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
                                         <input
                                             type="text"
                                             value={editName}
@@ -224,12 +228,14 @@ function DeckList() {
                                             <button
                                                 onClick={() => setEditingDeckId(null)}
                                                 className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+                                                aria-label="Cancel editing"
                                             >
                                                 <X size={18} />
                                             </button>
                                             <button
                                                 onClick={handleUpdateDeck}
                                                 className="p-1.5 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-full transition-colors"
+                                                aria-label="Save changes"
                                             >
                                                 <Check size={18} />
                                             </button>
@@ -267,11 +273,11 @@ function DeckList() {
                                             <div className="md:hidden">
                                                 <button
                                                     onClick={(e) => {
-                                                        e.preventDefault();
                                                         e.stopPropagation();
-                                                        window.location.href = `/decks/${deck.id}/study`;
+                                                        navigate(`/decks/${deck.id}/study`);
                                                     }}
-                                                    className="p-2 bg-indigo-50 text-indigo-600 rounded-full"
+                                                    className="p-2 bg-indigo-50 text-indigo-600 rounded-full active:bg-indigo-100"
+                                                    aria-label="Start study session"
                                                 >
                                                     <PlayCircle size={20} />
                                                 </button>
@@ -280,7 +286,7 @@ function DeckList() {
                                     </>
                                 )}
                             </div>
-                        </Link>
+                        </div>
 
                         {/* Action Overlay - Desktop: Hover, Mobile: Always visible */}
                         {editingDeckId !== deck.id && (
@@ -304,13 +310,16 @@ function DeckList() {
 
                         {/* Study Button - Desktop: Bottom-right hover, Mobile: Handled in card body */}
                         {editingDeckId !== deck.id && (
-                            <Link
-                                to={`/decks/${deck.id}/study`}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/decks/${deck.id}/study`);
+                                }}
                                 className="hidden md:flex absolute bottom-6 right-6 p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 hover:scale-110 shadow-lg shadow-indigo-100 transition-all md:opacity-0 md:group-hover:opacity-100"
                                 title="Start Study Session"
                             >
                                 <PlayCircle size={24} />
-                            </Link>
+                            </button>
                         )}
                     </div>
                 ))}

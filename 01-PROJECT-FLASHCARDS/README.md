@@ -4,22 +4,19 @@ An intelligent flashcard application that helps students study more effectively.
 
 ## Features
 
-- **Secure Authentication**: User registration and login powered by JWT (JSON Web Tokens) and bcrypt password hashing.
-- **User Data Isolation**: Multi-user support ensuring users only see and manage their own flashcard decks.
+- **Secure Authentication**: User registration and login powered by JWT (JSON Web Tokens) with extended 30-day sessions and automatic expiration handling.
+- **User Data Isolation**: Multi-user support ensuring users only see and manage their own flashcard decks and data.
 - **AI-Powered Generation**: Upload PDF documents to automatically generate flashcards using Google Gemini Flash.
-- **Study Mode**: Interactive study mode with flip animations and navigation.
-- **Deck Management**: Create, organize, and manage multiple flashcard decks.
-- **Deck Deletion**: Easily remove unwanted decks and associated cards with a single click.
-- **Feedback Loop**: Rate and refine AI-generated cards to improve quality.
-- **Modern UI**: Clean, responsive interface built with React and Tailwind CSS.
+- **Smart Card Categorization**: Track your progress by categorizing cards into **New**, **Revise**, or **All Done** with intuitive status badges.
+- **Deck Tagging & Organization**: Add custom tags to your decks for better organization and management.
+- **Real-Time Filtering**: Instantly find any deck by searching through names, descriptions, or tags using the intelligent search bar.
+- **Mobile-Optimized Interface**: A responsive UI with optimized touch targets and accessible action bars designed for seamless use on any device.
+- **Interactive Study Mode**: Focus on learning with flip animations, navigation controls, and organized card grouping.
+- **Feedback Loop**: Rate and refine AI-generated cards to improve quality and personal learning experience.
 
 The app is deployed to Render and can be accessed at https://flashcard-ai-app.onrender.com
 
 ## Tech Stack
-
-![App Screenshot](image.png)
-
-AI Agent uses the MCP server to extract the pdf text. It is to avoid overloading the LLM with large pdfs. Also, later if another pdf extraction tool or documents of other formats have to be supported, it can be done easily by just changing the MCP server.
 
 ### Frontend
 - **Framework**: React 18 with Vite
@@ -42,6 +39,11 @@ AI Agent uses the MCP server to extract the pdf text. It is to avoid overloading
 - **Web Server**: Nginx (Reverse proxy)
 - **Deployment**: [Render](https://render.com) (via Webservices)
 - **CI/CD**: GitHub Actions (Automated testing & linting)
+
+
+![App Screenshot](image.png)
+
+AI Agent uses the MCP server to extract the pdf text. It is to avoid overloading the LLM with large pdfs. Also, later if another pdf extraction tool or documents of other formats have to be supported, it can be done easily by just changing the MCP server.
 
 ## Prerequisites
 
@@ -93,22 +95,6 @@ uvicorn app.main:app --reload
 *Tip: If `uvicorn` is not found, try running `python -m uvicorn app.main:app --reload` instead.*
 
 The backend will run at `http://localhost:8000`. API specs available at `http://localhost:8000/docs`.
-
-### Switching to PostgreSQL (Optional)
-
-The application defaults to SQLite (`sqlite:///database.db`). To switch to PostgreSQL:
-
-1. **Install the driver**:
-   ```bash
-   pip install psycopg2-binary
-   ```
-2. **Update `.env`**:
-   Change `DATABASE_URL` to your PostgreSQL connection string:
-   ```env
-   DATABASE_URL=postgresql://user:password@localhost:5432/flashcards_db
-   ```
-3. **Restart the Backend**:
-   The application will automatically connect to the new database.
 
 ### 3. Frontend Setup
 Navigate to the frontend directory:
@@ -184,3 +170,21 @@ Both the backend and frontend have comprehensive test suites ensuring reliabilit
 - **Backend**: 16 tests covering AI generation, refinement, CRUD operations, and **Strict Security Isolation**.
 - **Frontend**: 18 tests covering Login flow, Auth Guards, Study Mode, and AI UI flows.
 - **Overall Coverage**: Tracked automatically in CI via `pytest-cov` and `vitest`.
+
+
+### Switching to PostgreSQL (Optional)
+
+The application defaults to SQLite (`sqlite:///database.db`). To switch to PostgreSQL:
+
+1. **Install the driver**:
+   ```bash
+   pip install psycopg2-binary
+   ```
+2. **Update `.env`**:
+   Change `DATABASE_URL` to your PostgreSQL connection string:
+   ```env
+   DATABASE_URL=postgresql://user:password@localhost:5432/flashcards_db
+   ```
+3. **Restart the Backend**:
+   The application will automatically connect to the new database.
+

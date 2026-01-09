@@ -1,4 +1,5 @@
 from typing import List
+from datetime import timedelta
 import os
 from dotenv import load_dotenv
 
@@ -10,7 +11,7 @@ from sqlmodel import Session, select
 from jose import JWTError, jwt
 from app.database import create_db_and_tables, get_session
 from app.services.ai_agent import FlashcardAgent
-from app.auth import verify_password, get_password_hash, create_access_token, SECRET_KEY, ALGORITHM
+from app.auth import verify_password, get_password_hash, create_access_token, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from app.models import (
     Deck, DeckCreate, DeckRead, DeckUpdate,
     Card, CardCreate, CardRead, CardUpdate,
@@ -86,7 +87,10 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), ses
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token = create_access_token(data={"sub": user.username})
+    access_token = create_access_token(
+        data={"sub": user.username},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get("/users/me", response_model=UserRead)

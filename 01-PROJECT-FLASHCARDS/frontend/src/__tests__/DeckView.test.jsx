@@ -15,7 +15,11 @@ vi.mock('../api', () => ({
 }));
 
 const mockDeck = { id: 1, name: 'Integration Test Deck', description: 'Testing full flow' };
-const mockCards = [{ id: 1, front: 'Existing Q', back: 'Existing A', deck_id: 1 }];
+const mockCards = [
+    { id: 1, front: 'New Front', back: 'New Back', status: 'New', deck_id: 1 },
+    { id: 2, front: 'Revise Front', back: 'Revise Back', status: 'Revise', deck_id: 1 },
+    { id: 3, front: 'Done Front', back: 'Done Back', status: 'All Done', deck_id: 1 },
+];
 
 describe('DeckView Component', () => {
     beforeEach(() => {
@@ -34,10 +38,19 @@ describe('DeckView Component', () => {
         );
     };
 
-    it('renders deck name and existing cards', async () => {
+    it('renders deck name and cards grouped by status', async () => {
         renderDeckView();
         expect(await screen.findByText('Integration Test Deck')).toBeDefined();
-        expect(screen.getByText('Existing Q')).toBeDefined();
+
+        // Check for category headers
+        expect(screen.getByText('New')).toBeDefined();
+        expect(screen.getByText('Revise')).toBeDefined();
+        expect(screen.getByText('All Done')).toBeDefined();
+
+        // Check for cards in categories
+        expect(screen.getByText('New Front')).toBeDefined();
+        expect(screen.getByText('Revise Front')).toBeDefined();
+        expect(screen.getByText('Done Front')).toBeDefined();
     });
 
     it('opens and closes manual add card form', async () => {

@@ -1,10 +1,11 @@
 from fastapi.testclient import TestClient
 
 def test_create_deck(client: TestClient, auth_headers: dict):
-    response = client.post("/decks/", json={"name": "Test Deck", "description": "Unit Test"}, headers=auth_headers)
+    response = client.post("/decks/", json={"name": "Test Deck", "description": "Unit Test", "tags": "tag1, tag2"}, headers=auth_headers)
     assert response.status_code == 200
     data = response.json()
     assert data["name"] == "Test Deck"
+    assert data["tags"] == "tag1, tag2"
     assert "id" in data
 
 def test_read_decks(client: TestClient, auth_headers: dict):
@@ -25,11 +26,13 @@ def test_create_card(client: TestClient, auth_headers: dict):
     response = client.post("/cards/", json={
         "front": "Question",
         "back": "Answer",
+        "status": "Revise",
         "deck_id": deck_id
     }, headers=auth_headers)
     assert response.status_code == 200
     data = response.json()
     assert data["front"] == "Question"
+    assert data["status"] == "Revise"
     assert data["deck_id"] == deck_id
 
 def test_read_cards_by_deck(client: TestClient, auth_headers: dict):

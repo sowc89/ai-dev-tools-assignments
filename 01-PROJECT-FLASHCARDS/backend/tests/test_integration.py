@@ -12,24 +12,28 @@ sqlite_url = f"sqlite:///{sqlite_file_name}"
 engine = create_engine(sqlite_url, connect_args={"check_same_thread": False})
 
 def test_full_user_flow(client: TestClient, auth_headers: dict):
-    # 1. Create a Deck
-    deck_data = {"name": "Integration Test Deck", "description": "Testing full flow"}
+    # 1. Create a Deck with tags
+    deck_data = {"name": "Integration Test Deck", "description": "Testing full flow", "tags": "integration, test"}
     response = client.post("/decks/", json=deck_data, headers=auth_headers)
     assert response.status_code == 200
     deck = response.json()
     deck_id = deck["id"]
     assert deck["name"] == deck_data["name"]
+    assert deck["tags"] == "integration, test"
 
-    # 2. Add Cards Manually
-    card_data = {"front": "What is 2+2?", "back": "4", "deck_id": deck_id}
+    # 2. Add Cards Manually with status
+    card_data = {"front": "What is 2+2?", "back": "4", "status": "New", "deck_id": deck_id}
     response = client.post("/cards/", json=card_data, headers=auth_headers)
     assert response.status_code == 200
+    assert response.json()["status"] == "New"
     
-    # 3. Add Study Notes
-    notes_update = {"notes": "Remember to study math."}
+    # 3. Add Study Notes and Update Tags
+    notes_update = {"notes": "Remember to study math.", "tags": "math, updated"}
     response = client.put(f"/decks/{deck_id}", json=notes_update, headers=auth_headers)
     assert response.status_code == 200
-    assert response.json()["notes"] == "Remember to study math."
+    updated_deck = response.json()
+    assert updated_deck["notes"] == "Remember to study math."
+    assert updated_deck["tags"] == "math, updated"
 
     # 4. Verify Deck Content
     response = client.get(f"/decks/{deck_id}", headers=auth_headers)
