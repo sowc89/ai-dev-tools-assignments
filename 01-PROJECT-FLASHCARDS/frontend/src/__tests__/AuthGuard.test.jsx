@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import AuthGuard from '../components/AuthGuard';
+import { AuthProvider } from '../context/AuthContext';
 
 describe('AuthGuard Component', () => {
     beforeEach(() => {
@@ -11,19 +12,21 @@ describe('AuthGuard Component', () => {
 
     it('redirects to login when not authenticated', () => {
         render(
-            <MemoryRouter initialEntries={['/protected']}>
-                <Routes>
-                    <Route path="/login" element={<div>Login Page</div>} />
-                    <Route
-                        path="/protected"
-                        element={
-                            <AuthGuard>
-                                <div>Protected Content</div>
-                            </AuthGuard>
-                        }
-                    />
-                </Routes>
-            </MemoryRouter>
+            <AuthProvider>
+                <MemoryRouter initialEntries={['/protected']}>
+                    <Routes>
+                        <Route path="/login" element={<div>Login Page</div>} />
+                        <Route
+                            path="/protected"
+                            element={
+                                <AuthGuard>
+                                    <div>Protected Content</div>
+                                </AuthGuard>
+                            }
+                        />
+                    </Routes>
+                </MemoryRouter>
+            </AuthProvider>
         );
 
         expect(screen.getByText('Login Page')).toBeDefined();
@@ -34,19 +37,21 @@ describe('AuthGuard Component', () => {
         localStorage.setItem('isAuthenticated', 'true');
 
         render(
-            <MemoryRouter initialEntries={['/protected']}>
-                <Routes>
-                    <Route path="/login" element={<div>Login Page</div>} />
-                    <Route
-                        path="/protected"
-                        element={
-                            <AuthGuard>
-                                <div>Protected Content</div>
-                            </AuthGuard>
-                        }
-                    />
-                </Routes>
-            </MemoryRouter>
+            <AuthProvider>
+                <MemoryRouter initialEntries={['/protected']}>
+                    <Routes>
+                        <Route path="/login" element={<div>Login Page</div>} />
+                        <Route
+                            path="/protected"
+                            element={
+                                <AuthGuard>
+                                    <div>Protected Content</div>
+                                </AuthGuard>
+                            }
+                        />
+                    </Routes>
+                </MemoryRouter>
+            </AuthProvider>
         );
 
         expect(screen.getByText('Protected Content')).toBeDefined();

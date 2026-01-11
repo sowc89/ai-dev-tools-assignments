@@ -13,8 +13,8 @@ vi.mock('../api', () => ({
 }));
 
 const mockDecks = [
-    { id: 1, name: 'Math Deck', description: 'Calculus', tags: 'math, science' },
-    { id: 2, name: 'History Deck', description: 'World War II', tags: 'history, war' },
+    { id: 1, name: 'Math Deck', description: 'Calculus', tags: [{ name: 'math' }, { name: 'science' }] },
+    { id: 2, name: 'History Deck', description: 'World War II', tags: [{ name: 'history' }, { name: 'war' }] },
 ];
 
 describe('DeckList Component', () => {

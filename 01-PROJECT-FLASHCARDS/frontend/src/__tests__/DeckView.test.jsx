@@ -16,9 +16,9 @@ vi.mock('../api', () => ({
 
 const mockDeck = { id: 1, name: 'Integration Test Deck', description: 'Testing full flow' };
 const mockCards = [
-    { id: 1, front: 'New Front', back: 'New Back', status: 'New', deck_id: 1 },
-    { id: 2, front: 'Revise Front', back: 'Revise Back', status: 'Revise', deck_id: 1 },
-    { id: 3, front: 'Done Front', back: 'Done Back', status: 'All Done', deck_id: 1 },
+    { id: 1, front: 'New Front', back: 'New Back', status: 'NEW', deck_id: 1 },
+    { id: 2, front: 'Revise Front', back: 'Revise Back', status: 'REVIEWING', deck_id: 1 },
+    { id: 3, front: 'Done Front', back: 'Done Back', status: 'MASTERED', deck_id: 1 },
 ];
 
 describe('DeckView Component', () => {
@@ -44,8 +44,8 @@ describe('DeckView Component', () => {
 
         // Check for category headers
         expect(screen.getByText('New')).toBeDefined();
-        expect(screen.getByText('Revise')).toBeDefined();
-        expect(screen.getByText('All Done')).toBeDefined();
+        expect(screen.getByText('Reviewing')).toBeDefined();
+        expect(screen.getByText('Mastered')).toBeDefined();
 
         // Check for cards in categories
         expect(screen.getByText('New Front')).toBeDefined();

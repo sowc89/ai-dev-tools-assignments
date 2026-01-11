@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import Login from '../pages/Login';
+import { AuthProvider } from '../context/AuthContext';
 import * as api from '../api';
 
 // Mock useNavigate and useLocation
@@ -29,9 +30,11 @@ describe('Login Component', () => {
 
     it('renders login form by default', () => {
         render(
-            <MemoryRouter>
-                <Login />
-            </MemoryRouter>
+            <AuthProvider>
+                <MemoryRouter>
+                    <Login />
+                </MemoryRouter>
+            </AuthProvider>
         );
         expect(screen.getByText('Welcome Back')).toBeDefined();
         expect(screen.getByPlaceholderText('Enter username')).toBeDefined();
@@ -40,9 +43,11 @@ describe('Login Component', () => {
 
     it('toggles to registration form', () => {
         render(
-            <MemoryRouter>
-                <Login />
-            </MemoryRouter>
+            <AuthProvider>
+                <MemoryRouter>
+                    <Login />
+                </MemoryRouter>
+            </AuthProvider>
         );
         const toggleBtn = screen.getByText(/Don't have an account\? Sign Up/i);
         fireEvent.click(toggleBtn);
@@ -57,9 +62,11 @@ describe('Login Component', () => {
         api.loginUser.mockResolvedValue({ access_token: 'fake-token' });
 
         render(
-            <MemoryRouter>
-                <Login />
-            </MemoryRouter>
+            <AuthProvider>
+                <MemoryRouter>
+                    <Login />
+                </MemoryRouter>
+            </AuthProvider>
         );
 
         fireEvent.change(screen.getByPlaceholderText('Enter username'), { target: { value: 'testuser' } });
@@ -78,9 +85,11 @@ describe('Login Component', () => {
         api.loginUser.mockRejectedValue(new Error('Unauthorized'));
 
         render(
-            <MemoryRouter>
-                <Login />
-            </MemoryRouter>
+            <AuthProvider>
+                <MemoryRouter>
+                    <Login />
+                </MemoryRouter>
+            </AuthProvider>
         );
 
         // Fill data to avoid potential issues with 'required' (though fireEvent skips browser validation)
@@ -96,9 +105,11 @@ describe('Login Component', () => {
         api.loginUser.mockResolvedValue({ access_token: 'new-token' });
 
         render(
-            <MemoryRouter>
-                <Login />
-            </MemoryRouter>
+            <AuthProvider>
+                <MemoryRouter>
+                    <Login />
+                </MemoryRouter>
+            </AuthProvider>
         );
 
         fireEvent.click(screen.getByText(/Don't have an account\? Sign Up/i));

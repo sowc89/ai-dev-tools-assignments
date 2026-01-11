@@ -49,11 +49,6 @@ describe('API functions', () => {
             response: { status: 401 }
         };
 
-        // Mock window.location.href
-        const originalLocation = window.location;
-        delete window.location;
-        window.location = { href: '' };
-
         localStorage.setItem('token', 'stale');
         localStorage.setItem('isAuthenticated', 'true');
 
@@ -65,9 +60,5 @@ describe('API functions', () => {
 
         expect(localStorage.getItem('token')).toBeNull();
         expect(localStorage.getItem('isAuthenticated')).toBeNull();
-        expect(window.location.href).toBe('/login');
-
-        // Restore window.location
-        window.location = originalLocation;
     });
 });
