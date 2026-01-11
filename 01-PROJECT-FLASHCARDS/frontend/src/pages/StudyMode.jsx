@@ -123,11 +123,11 @@ function StudyMode() {
                                     <span className="absolute top-6 left-6 text-xs font-bold text-slate-400 tracking-wider uppercase">Question</span>
 
                                     {currentCard.status && (
-                                        <span className={`absolute top-6 right-6 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tighter ${currentCard.status === 'New' ? 'bg-rose-100 text-rose-600' :
-                                            currentCard.status === 'Revise' ? 'bg-orange-100 text-orange-600' :
+                                        <span className={`absolute top-6 right-6 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tighter ${currentCard.status === 'NEW' ? 'bg-rose-100 text-rose-600' :
+                                            currentCard.status === 'REVIEWING' ? 'bg-orange-100 text-orange-600' :
                                                 'bg-emerald-100 text-emerald-600'
                                             }`}>
-                                            {currentCard.status}
+                                            {currentCard.status.charAt(0) + currentCard.status.slice(1).toLowerCase()}
                                         </span>
                                     )}
 
@@ -144,11 +144,11 @@ function StudyMode() {
                                     <span className="absolute top-6 left-6 text-xs font-bold text-indigo-400 tracking-wider uppercase">Answer</span>
 
                                     {currentCard.status && (
-                                        <span className={`absolute top-6 right-6 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tighter ${currentCard.status === 'New' ? 'bg-rose-200 text-rose-700' :
-                                            currentCard.status === 'Revise' ? 'bg-orange-200 text-orange-700' :
+                                        <span className={`absolute top-6 right-6 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tighter ${currentCard.status === 'NEW' ? 'bg-rose-200 text-rose-700' :
+                                            currentCard.status === 'REVIEWING' ? 'bg-orange-200 text-orange-700' :
                                                 'bg-emerald-200 text-emerald-700'
                                             }`}>
-                                            {currentCard.status}
+                                            {currentCard.status.charAt(0) + currentCard.status.slice(1).toLowerCase()}
                                         </span>
                                     )}
 
@@ -162,8 +162,8 @@ function StudyMode() {
                         {/* Status Selection */}
                         <div className="flex items-center justify-center gap-2 sm:gap-4 mt-8">
                             <button
-                                onClick={() => handleStatusChange('New')}
-                                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${currentCard.status === 'New'
+                                onClick={() => handleStatusChange('NEW')}
+                                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${currentCard.status === 'NEW'
                                     ? 'bg-rose-100 text-rose-700 ring-2 ring-rose-300'
                                     : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'
                                     }`}
@@ -171,22 +171,22 @@ function StudyMode() {
                                 New
                             </button>
                             <button
-                                onClick={() => handleStatusChange('Revise')}
-                                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${currentCard.status === 'Revise'
+                                onClick={() => handleStatusChange('REVIEWING')}
+                                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${currentCard.status === 'REVIEWING'
                                     ? 'bg-orange-100 text-orange-700 ring-2 ring-orange-300'
                                     : 'text-slate-400 hover:bg-orange-50 hover:text-orange-600'
                                     }`}
                             >
-                                Revise
+                                Reviewing
                             </button>
                             <button
-                                onClick={() => handleStatusChange('All Done')}
-                                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${currentCard.status === 'All Done'
+                                onClick={() => handleStatusChange('MASTERED')}
+                                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${currentCard.status === 'MASTERED'
                                     ? 'bg-emerald-100 text-emerald-700 ring-2 ring-emerald-300'
                                     : 'text-slate-400 hover:bg-emerald-50 hover:text-emerald-600'
                                     }`}
                             >
-                                All Done
+                                Mastered
                             </button>
                         </div>
 

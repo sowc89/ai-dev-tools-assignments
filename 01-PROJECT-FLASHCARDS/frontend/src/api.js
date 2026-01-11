@@ -24,8 +24,8 @@ api.interceptors.response.use(
             // Clear authentication state
             localStorage.removeItem('token');
             localStorage.removeItem('isAuthenticated');
-            // Redirect to login page
-            window.location.href = '/login';
+            // We avoid window.location.href here to prevent full page reloads.
+            // The AuthGuard or AuthContext will detect the state change and redirect.
         }
         return Promise.reject(error);
     }

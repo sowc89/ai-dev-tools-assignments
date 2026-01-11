@@ -1,6 +1,33 @@
 from typing import List, Optional
 from sqlmodel import Field, Relationship, SQLModel
 from datetime import datetime
+from enum import Enum
+
+class CardStatus(str, Enum):
+    NEW = "NEW"
+    REVIEWING = "REVIEWING"
+    MASTERED = "MASTERED"
+
+# Association table for Deck and Tag (Many-to-Many)
+class DeckTagLink(SQLModel, table=True):
+    deck_id: Optional[int] = Field(default=None, foreign_key="deck.id", primary_key=True)
+    tag_id: Optional[int] = Field(default=None, foreign_key="tag.id", primary_key=True)
+
+# Tag Model
+class TagBase(SQLModel):
+    name: str = Field(unique=True, index=True)
+
+class Tag(TagBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    
+    # Relationship to Decks
+    decks: List["Deck"] = Relationship(back_populates="tags", link_model=DeckTagLink)
+
+class TagCreate(TagBase):
+    pass
+
+class TagRead(TagBase):
+    id: int
 
 # User Model
 class UserBase(SQLModel):
@@ -32,7 +59,6 @@ class TokenData(SQLModel):
 class DeckBase(SQLModel):
     name: str = Field(index=True)
     description: Optional[str] = None
-    tags: Optional[str] = Field(default="")
 
 class Deck(DeckBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -44,27 +70,31 @@ class Deck(DeckBase, table=True):
     user: Optional[User] = Relationship(back_populates="decks")
     
     # Relationship to Cards
-    cards: List["Card"] = Relationship(back_populates="deck")
+    cards: List["Card"] = Relationship(back_populates="deck", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    
+    # Relationship to Tags
+    tags: List[Tag] = Relationship(back_populates="decks", link_model=DeckTagLink)
 
 class DeckCreate(DeckBase):
-    pass
+    tags: Optional[List[str]] = None
 
 class DeckRead(DeckBase):
     id: int
     created_at: datetime
     notes: Optional[str] = None
+    tags: List[TagRead] = []
 
 class DeckUpdate(SQLModel):
     name: Optional[str] = None
     description: Optional[str] = None
     notes: Optional[str] = None
-    tags: Optional[str] = None
+    tags: Optional[List[str]] = None
 
 # Card Model
 class CardBase(SQLModel):
     front: str
     back: str
-    status: str = Field(default="New")
+    status: CardStatus = Field(default=CardStatus.NEW)
     deck_id: Optional[int] = Field(default=None, foreign_key="deck.id")
 
 class Card(CardBase, table=True):
@@ -84,7 +114,7 @@ class CardRead(CardBase):
 class CardUpdate(SQLModel):
     front: Optional[str] = None
     back: Optional[str] = None
-    status: Optional[str] = None
+    status: Optional[CardStatus] = None
 
 # AI Models
 class GenerateResponse(SQLModel):

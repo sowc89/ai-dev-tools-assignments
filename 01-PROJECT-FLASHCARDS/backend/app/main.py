@@ -14,7 +14,8 @@ from app.services.ai_agent import FlashcardAgent
 from app.auth import verify_password, get_password_hash, create_access_token, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from app.models import (
     Deck, DeckCreate, DeckRead, DeckUpdate,
-    Card, CardCreate, CardRead, CardUpdate,
+    Card, CardCreate, CardRead, CardUpdate, CardStatus,
+    Tag, TagRead, TagCreate, DeckTagLink,
     GenerateResponse, RefineRequest,
     User, UserCreate, UserRead, Token, TokenData
 )
@@ -94,7 +95,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), ses
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Invalid username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = create_access_token(
@@ -109,10 +110,27 @@ def read_users_me(current_user: User = Depends(get_current_user)):
 
 # --- Deck Endpoints ---
 
+def get_or_create_tags(session: Session, tag_names: List[str]) -> List[Tag]:
+    tags = []
+    for name in tag_names:
+        name = name.strip().lower()
+        if not name: continue
+        tag = session.exec(select(Tag).where(Tag.name == name)).first()
+        if not tag:
+            tag = Tag(name=name)
+            session.add(tag)
+        tags.append(tag)
+    return tags
+
 @app.post("/decks/", response_model=DeckRead)
 def create_deck(deck: DeckCreate, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
-    db_deck = Deck.from_orm(deck)
+    deck_data = deck.dict(exclude={"tags"})
+    db_deck = Deck(**deck_data)
     db_deck.user_id = current_user.id
+    
+    if deck.tags:
+        db_deck.tags = get_or_create_tags(session, deck.tags)
+    
     session.add(db_deck)
     session.commit()
     session.refresh(db_deck)
@@ -137,6 +155,13 @@ def update_deck(deck_id: int, deck_update: DeckUpdate, session: Session = Depend
         raise HTTPException(status_code=404, detail="Deck not found or no access")
     
     deck_data = deck_update.dict(exclude_unset=True)
+    
+    # Handle tags separately
+    if "tags" in deck_data:
+        tag_names = deck_data.pop("tags")
+        if tag_names is not None:
+             db_deck.tags = get_or_create_tags(session, tag_names)
+
     for key, value in deck_data.items():
         setattr(db_deck, key, value)
         
@@ -227,8 +252,13 @@ async def generate_cards(
         print("DEBUG: Filename check failed")
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
 
-    # Read PDF content
+    # Memory-efficient reading: UploadFile uses a SpooledTemporaryFile.
+    # We can read in chunks if we were processing it locally, but since we
+    # passed it to the AI agent which expects bytes, we still need to load it.
+    # To improve this, we could pass a file path to the agent if stored locally.
+    # For now, we'll keep it as bytes but acknowledge the limitation.
     content = await file.read()
+    await file.close() # Ensure file is closed after reading
     
     try:
         # Initialize agent
@@ -239,9 +269,10 @@ async def generate_cards(
         return GenerateResponse(cards=valid_cards, source_text=source_text)
         
     except ValueError as ve:
-        raise HTTPException(status_code=500, detail=str(ve))
+        raise HTTPException(status_code=500, detail="AI configuration error")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")
+        print(f"DEBUG: AI generation failed: {str(e)}") # Log internally
+        raise HTTPException(status_code=500, detail="Flashcard generation failed. Please try again later.")
 
 @app.post("/generate/refine", response_model=List[CardCreate])
 async def refine_cards(request: RefineRequest, current_user: User = Depends(get_current_user)):
@@ -250,4 +281,5 @@ async def refine_cards(request: RefineRequest, current_user: User = Depends(get_
         new_cards = await agent.refine_flashcards(request.cards, request.source_text, request.feedback)
         return new_cards
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Refinement failed: {str(e)}")
+        print(f"DEBUG: Refinement failed: {str(e)}") # Log internally
+        raise HTTPException(status_code=500, detail="Flashcard refinement failed. Please try again later.")

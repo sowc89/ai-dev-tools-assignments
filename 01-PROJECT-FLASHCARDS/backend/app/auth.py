@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Security settings
-SECRET_KEY = os.getenv("SECRET_KEY", "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7")
+SECRET_KEY = os.getenv("SECRET_KEY", "insecure-dev-key-change-me-in-production")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 43200  # 30 days for convenience in demo
+ACCESS_TOKEN_EXPIRE_MINUTES = 60  # Reduced from 30 days to 1 hour for security
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

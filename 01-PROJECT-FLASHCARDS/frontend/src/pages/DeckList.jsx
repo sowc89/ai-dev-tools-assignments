@@ -32,10 +32,15 @@ function DeckList() {
     const handleCreateDeck = async (e) => {
         e.preventDefault();
         try {
+            // Split by comma and filter out empty strings
+            const tagList = newDeckTags.split(',')
+                .map(t => t.trim())
+                .filter(t => t !== '');
+
             await createDeck({
                 name: newDeckName,
                 description: newDeckDesc,
-                tags: newDeckTags
+                tags: tagList
             });
             setNewDeckName('');
             setNewDeckDesc('');
@@ -66,10 +71,14 @@ function DeckList() {
     const handleUpdateDeck = async (e) => {
         e.preventDefault();
         try {
+            const tagList = editTags.split(',')
+                .map(t => t.trim())
+                .filter(t => t !== '');
+
             await updateDeck(editingDeckId, {
                 name: editName,
                 description: editDesc,
-                tags: editTags
+                tags: tagList
             });
             setEditingDeckId(null);
             loadDecks();
@@ -84,15 +93,18 @@ function DeckList() {
         setEditingDeckId(deck.id);
         setEditName(deck.name);
         setEditDesc(deck.description || '');
-        setEditTags(deck.tags || '');
+        // Convert array of Tag objects to comma-separated string for editing
+        const tagsString = deck.tags ? deck.tags.map(t => t.name).join(', ') : '';
+        setEditTags(tagsString);
     };
 
     const filteredDecks = decks.filter(deck => {
         const query = searchQuery.toLowerCase();
+        const tagsString = deck.tags ? deck.tags.map(t => t.name).join(', ') : '';
         return (
             deck.name.toLowerCase().includes(query) ||
             (deck.description && deck.description.toLowerCase().includes(query)) ||
-            (deck.tags && deck.tags.toLowerCase().includes(query))
+            tagsString.toLowerCase().includes(query)
         );
     });
 
@@ -253,11 +265,11 @@ function DeckList() {
                                                 {deck.description || "No description"}
                                             </p>
 
-                                            {deck.tags && (
+                                            {deck.tags && deck.tags.length > 0 && (
                                                 <div className="flex flex-wrap gap-2 mb-4">
-                                                    {deck.tags.split(',').map((tag, idx) => (
+                                                    {deck.tags.map((tag, idx) => (
                                                         <span key={idx} className="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">
-                                                            {tag.trim()}
+                                                            {tag.name}
                                                         </span>
                                                     ))}
                                                 </div>

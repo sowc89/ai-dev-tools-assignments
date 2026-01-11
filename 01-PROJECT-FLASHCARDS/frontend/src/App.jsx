@@ -5,14 +5,14 @@ import StudyMode from './pages/StudyMode';
 import Login from './pages/Login';
 import AuthGuard from './components/AuthGuard';
 import { LogOut } from 'lucide-react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 function Navbar() {
     const navigate = useNavigate();
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    const { isAuthenticated, logout } = useAuth();
 
     const handleLogout = () => {
-        localStorage.removeItem('isAuthenticated');
-        localStorage.removeItem('token');
+        logout();
         navigate('/login');
     };
 
@@ -38,31 +38,33 @@ function Navbar() {
 
 function App() {
     return (
-        <Router>
-            <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-                <Navbar />
-                <main>
-                    <Routes>
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/" element={
-                            <AuthGuard>
-                                <DeckList />
-                            </AuthGuard>
-                        } />
-                        <Route path="/decks/:id" element={
-                            <AuthGuard>
-                                <DeckView />
-                            </AuthGuard>
-                        } />
-                        <Route path="/decks/:id/study" element={
-                            <AuthGuard>
-                                <StudyMode />
-                            </AuthGuard>
-                        } />
-                    </Routes>
-                </main>
-            </div>
-        </Router>
+        <AuthProvider>
+            <Router>
+                <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+                    <Navbar />
+                    <main>
+                        <Routes>
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/" element={
+                                <AuthGuard>
+                                    <DeckList />
+                                </AuthGuard>
+                            } />
+                            <Route path="/decks/:id" element={
+                                <AuthGuard>
+                                    <DeckView />
+                                </AuthGuard>
+                            } />
+                            <Route path="/decks/:id/study" element={
+                                <AuthGuard>
+                                    <StudyMode />
+                                </AuthGuard>
+                            } />
+                        </Routes>
+                    </main>
+                </div>
+            </Router>
+        </AuthProvider>
     );
 }
 

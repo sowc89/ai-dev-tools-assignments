@@ -15,8 +15,9 @@ class FlashcardAgent:
             raise ValueError("GOOGLE_API_KEY not configured")
         
         genai.configure(api_key=self.api_key)
-        # Using gemini-flash-latest (stable alias which points to 1.5 Flash usually) 
-        self.model = genai.GenerativeModel('gemini-flash-latest')
+        # Reverting to 'gemini-flash-latest' as 'gemini-1.5-flash' caused 404
+        self.model_name = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
+        self.model = genai.GenerativeModel(self.model_name)
 
     async def generate_from_pdf(self, pdf_content: bytes, start_page: int = 1, end_page: int = -1) -> Tuple[List[CardCreate], str]:
         # MCP Server parameters for the backend extraction tool
@@ -46,6 +47,8 @@ class FlashcardAgent:
                     # For simplicity in this implementation, we define the tool interface manually
                     # but it maps directly to the mcp_server.py 'extract_text_from_pdf' tool.
                     
+                    # Note: We define this local function to provide Gemini with the tool signature.
+                    # The actual implementation is handled in the execution loop below.
                     def extract_text_from_pdf(start_page: int, end_page: int) -> str:
                         """
                         Extracts text from the uploaded PDF for the given page range.
@@ -54,12 +57,11 @@ class FlashcardAgent:
                             start_page: The starting page number (1-indexed).
                             end_page: The ending page number (1-indexed). Use -1 for the end of the document.
                         """
-                        pass
+                        return f"Extracting text from pages {start_page} to {end_page}..."
 
                     # Temporarily update model with tools for this session
-                    # We create a new model instance with the tools registered
                     model_with_tools = genai.GenerativeModel(
-                        model_name='gemini-flash-latest',
+                        model_name=self.model_name,
                         tools=[extract_text_from_pdf]
                     )
                     

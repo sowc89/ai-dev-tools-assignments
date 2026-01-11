@@ -141,7 +141,16 @@ function DeckView() {
 
             <header className="mb-8">
                 <h1 className="text-4xl font-bold text-slate-900 mb-2">{deck.name}</h1>
-                <p className="text-xl text-slate-600">{deck.description}</p>
+                <p className="text-xl text-slate-600 mb-4">{deck.description}</p>
+                {deck.tags && deck.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                        {deck.tags.map((tag, idx) => (
+                            <span key={idx} className="bg-indigo-50 text-indigo-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                                {tag.name}
+                            </span>
+                        ))}
+                    </div>
+                )}
             </header>
 
             <div className="flex gap-4 mb-8">
@@ -339,18 +348,18 @@ function DeckView() {
             }
 
             <div className="space-y-8">
-                {['New', 'Revise', 'All Done'].map((status) => {
-                    const filteredCards = cards.filter(card => card.status === status || (!card.status && status === 'New'));
+                {['NEW', 'REVIEWING', 'MASTERED'].map((status) => {
+                    const filteredCards = cards.filter(card => card.status === status || (!card.status && status === 'NEW'));
                     if (filteredCards.length === 0) return null;
 
                     return (
                         <div key={status} className="space-y-4">
                             <div className="flex items-center gap-2 mb-4">
-                                <h3 className={`text-sm font-bold uppercase tracking-widest px-3 py-1 rounded-full ${status === 'New' ? 'bg-rose-100 text-rose-600' :
-                                        status === 'Revise' ? 'bg-orange-100 text-orange-600' :
-                                            'bg-emerald-100 text-emerald-600'
+                                <h3 className={`text-sm font-bold uppercase tracking-widest px-3 py-1 rounded-full ${status === 'NEW' ? 'bg-rose-100 text-rose-600' :
+                                    status === 'REVIEWING' ? 'bg-orange-100 text-orange-600' :
+                                        'bg-emerald-100 text-emerald-600'
                                     }`}>
-                                    {status}
+                                    {status.charAt(0) + status.slice(1).toLowerCase()}
                                 </h3>
                                 <div className="flex-1 h-px bg-slate-100"></div>
                                 <span className="text-xs font-bold text-slate-400">{filteredCards.length} cards</span>
@@ -361,8 +370,8 @@ function DeckView() {
                                     <div key={card.id} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow relative overflow-hidden">
                                         {/* Status Strip */}
                                         <div className={`absolute top-0 left-0 w-1 h-full ${status === 'New' ? 'bg-rose-400' :
-                                                status === 'Revise' ? 'bg-orange-400' :
-                                                    'bg-emerald-400'
+                                            status === 'Revise' ? 'bg-orange-400' :
+                                                'bg-emerald-400'
                                             }`} />
 
                                         <div className="flex-1">

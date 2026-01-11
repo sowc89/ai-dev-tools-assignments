@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Lock, User, Mail, UserPlus, LogIn } from 'lucide-react';
 import { loginUser, registerUser } from '../api';
+import { useAuth } from '../context/AuthContext';
 
 function Login() {
     const [isRegister, setIsRegister] = useState(false);
@@ -14,6 +15,7 @@ function Login() {
 
     const navigate = useNavigate();
     const location = useLocation();
+    const { login } = useAuth();
 
     // Get the page the user was trying to access, or default to home
     const from = location.state?.from?.pathname || "/";
@@ -33,8 +35,7 @@ function Login() {
                 await registerUser(username, password, email);
                 // After registration, log them in
                 const loginData = await loginUser(username, password);
-                localStorage.setItem('token', loginData.access_token);
-                localStorage.setItem('isAuthenticated', 'true');
+                login(loginData.access_token);
                 navigate(from, { replace: true });
             } catch (err) {
                 setError(err.response?.data?.detail || 'Registration failed. Username might be taken.');
@@ -42,8 +43,7 @@ function Login() {
         } else {
             try {
                 const data = await loginUser(username, password);
-                localStorage.setItem('token', data.access_token);
-                localStorage.setItem('isAuthenticated', 'true');
+                login(data.access_token);
                 navigate(from, { replace: true });
             } catch (err) {
                 setError('Invalid username or password.');

@@ -7,7 +7,7 @@ An intelligent flashcard application that helps students study more effectively.
 - **Secure Authentication**: User registration and login powered by JWT (JSON Web Tokens) with extended 30-day sessions and automatic expiration handling.
 - **User Data Isolation**: Multi-user support ensuring users only see and manage their own flashcard decks and data.
 - **AI-Powered Generation**: Upload PDF documents to automatically generate flashcards using Google Gemini Flash.
-- **Smart Card Categorization**: Track your progress by categorizing cards into **New**, **Revise**, or **All Done** with intuitive status badges.
+- **Smart Card Categorization**: Track your progress by categorizing cards into **New**, **Reviewing**, or **Mastered** with intuitive status badges.
 - **Deck Tagging & Organization**: Add custom tags to your decks for better organization and management.
 - **Real-Time Filtering**: Instantly find any deck by searching through names, descriptions, or tags using the intelligent search bar.
 - **Mobile-Optimized Interface**: A responsive UI with optimized touch targets and accessible action bars designed for seamless use on any device.
@@ -44,6 +44,8 @@ The app is deployed to Render and can be accessed at https://flashcard-ai-app.on
 ![App Screenshot](image.png)
 
 AI Agent uses the MCP server to extract the pdf text. It is to avoid overloading the LLM with large pdfs. Also, later if another pdf extraction tool or documents of other formats have to be supported, it can be done easily by just changing the MCP server.
+
+AGENT_WORKFLOW.md has the details of how the coding assistant and mcp tools assisted the project development workflow. 
 
 ## Prerequisites
 
