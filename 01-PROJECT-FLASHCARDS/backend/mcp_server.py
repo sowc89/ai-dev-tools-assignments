@@ -7,9 +7,16 @@ import base64
 # Initialize FastMCP server
 mcp = FastMCP("PDF Extractor")
 
-def extract_text_logic(pdf_base64: str, start_page: int = 1, end_page: int = -1) -> str:
+def extract_text_logic(pdf_base64: str = None, start_page: int = 1, end_page: int = -1, pdf_path: str = None) -> str:
     try:
-        pdf_content = base64.b64decode(pdf_base64)
+        if pdf_path:
+            with open(pdf_path, "rb") as f:
+                pdf_content = f.read()
+        elif pdf_base64:
+            pdf_content = base64.b64decode(pdf_base64)
+        else:
+            return "No PDF content provided (either pdf_base64 or pdf_path required)"
+
         reader = pypdf.PdfReader(io.BytesIO(pdf_content))
         total_pages = len(reader.pages)
         
@@ -33,20 +40,21 @@ def extract_text_logic(pdf_base64: str, start_page: int = 1, end_page: int = -1)
         return f"Error extracting PDF text: {str(e)}"
 
 @mcp.tool()
-def extract_text_from_pdf(pdf_base64: str, start_page: int = 1, end_page: int = -1) -> str:
+def extract_text_from_pdf(pdf_base64: str = None, start_page: int = 1, end_page: int = -1, pdf_path: str = None) -> str:
     """
     Extracts text from a PDF file within a specified page range.
     
     Args:
-        pdf_base64: The Base64 encoded string of the PDF file.
+        pdf_base64: Optional. The Base64 encoded string of the PDF file.
         start_page: The starting page number (1-indexed). Defaults to 1.
         end_page: The ending page number (1-indexed). Defaults to -1 (last page).
                   If end_page is -1 or greater than the total pages, it extracts until the end.
+        pdf_path: Optional. The absolute path to the PDF file on the server.
     
     Returns:
         The extracted text from the specified pages joined by newlines.
     """
-    return extract_text_logic(pdf_base64, start_page, end_page)
+    return extract_text_logic(pdf_base64, start_page, end_page, pdf_path)
 
 if __name__ == "__main__":
     mcp.run(show_banner=False)

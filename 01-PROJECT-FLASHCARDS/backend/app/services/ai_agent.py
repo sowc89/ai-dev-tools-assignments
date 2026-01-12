@@ -1,5 +1,6 @@
 import os
 import json
+import tempfile
 import google.generativeai as genai
 from typing import List, Tuple
 from app.models import CardCreate
@@ -31,9 +32,12 @@ class FlashcardAgent:
             env=None
         )
         
-        # We need to share the PDF content with the tool if called.
-        # Since the tool lives on the same server, we can pass it via base64 in the tool call.
-        pdf_base64 = base64.b64encode(pdf_content).decode('utf-8')
+        # Save PDF to a temporary file for the MCP server to read
+        # Using a temporary file is more efficient than passing large base64 strings
+        temp_pdf = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+        temp_pdf.write(pdf_content)
+        temp_pdf_path = temp_pdf.name
+        temp_pdf.close()
         
         extracted_text = ""
         
@@ -103,7 +107,7 @@ class FlashcardAgent:
                                 # Fallback if items() is not available
                                 tool_args = dict(call.args)
                                 
-                            tool_args["pdf_base64"] = pdf_base64
+                            tool_args["pdf_path"] = temp_pdf_path
                             
                             mcp_result = await session.call_tool("extract_text_from_pdf", arguments=tool_args)
                             
@@ -156,6 +160,14 @@ class FlashcardAgent:
             import traceback
             traceback.print_exc()
             raise e
+        finally:
+            # Clean up the temporary file
+            if 'temp_pdf_path' in locals() and os.path.exists(temp_pdf_path):
+                try:
+                    os.remove(temp_pdf_path)
+                    print(f"DEBUG: Cleaned up temporary PDF file: {temp_pdf_path}")
+                except Exception as cleanup_err:
+                    print(f"DEBUG: Failed to cleanup temp file: {cleanup_err}")
 
     async def refine_flashcards(self, current_cards: List[CardCreate], source_text: str, feedback: str) -> List[CardCreate]:
         # Serialize current cards to JSON for the prompt
