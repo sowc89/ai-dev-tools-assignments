@@ -5,7 +5,7 @@ An intelligent flashcard application that helps students study more effectively.
 ## Features
 
 ### Core Functionality
-- **Secure Authentication**: User registration and login powered by JWT (JSON Web Tokens) with extended 30-day sessions and automatic expiration handling.
+- **Secure Authentication**: User registration and login powered by JWT (JSON Web Tokens) with 1-hour session tokens and automatic expiration handling.
 - **User Data Isolation**: Multi-user support ensuring users only see and manage their own flashcard decks and data.
 - **Smart Card Categorization**: Track your progress by categorizing cards into **New**, **Reviewing**, or **Mastered** with intuitive status badges.
 - **Deck Tagging & Organization**: Add custom tags to your decks for better organization and management.
