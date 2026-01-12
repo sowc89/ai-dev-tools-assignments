@@ -63,7 +63,7 @@ The app is deployed to Render and can be accessed at https://flashcard-ai-app.on
 ### 1. Clone the Repository
 ```bash
 git clone <repository-url>
-cd flashcards-app
+cd 01-PROJECT-FLASHCARDS
 ```
 
 ### 2. Backend Setup
@@ -141,7 +141,7 @@ npm test -- --coverage
 The project includes a CI pipeline that runs on every push and pull request to the `main` branch.
 - **Location**: `.github/workflows/flashcards-ci.yml` (Repository Root)
 - **Checks**: Backend tests, Frontend tests, and Linting.
-- **Code Coverage**: Automaticaly reports test coverage metrics in the CI logs (aiming for high quality and isolation).
+- **Code Coverage**: Automatically reports test coverage metrics in the CI logs (aiming for high quality and isolation).
 - **Gated Deployment**: If all tests pass and the branch is `main`, GitHub automatically triggers a deployment to Render via a Deploy Hook.
 
 **Important Note for Success-only Deployment:**
