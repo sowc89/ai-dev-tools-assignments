@@ -1,6 +1,6 @@
-##Project workflow using the AI tools
+### Project workflow using the AI tools
 
-The project was developed using the Google Antigravity editor and its AI coding assistant. To demonstrate the MCP capabilities, I found a multimodel code reviewer tool (https://lobehub.com/mcp/igor-safonov-git-code-review-mcp?activeTab=deployment) which is a fastmcp server that can be ran locally. I ran this tool and configured it as an MCP server in the Antigravity editor. Configuration file looks like this: 
+The project was developed using the Google Antigravity editor and its AI coding assistant. To demonstrate the MCP capabilities, I found a multimodel code reviewer tool (https://lobehub.com/mcp/igor-safonov-git-code-review-mcp?activeTab=deployment) which is a fastmcp server that can be ran locally. ( Faced few issues and fixed those using the AI coding assistant). I ran this tool and configured it as an MCP server in the Antigravity editor. Configuration file looks like this: 
 
 ```json
 {
@@ -16,15 +16,13 @@ The project was developed using the Google Antigravity editor and its AI coding 
     "inputs": []
 }
 ```
+Now that this is configured, we can use the MCP server as a tool in the AI coding assistant.
 
+### How the Project Progressed and AI assistant prompts
 
+I used the following initial prompt to start the project and refine it with more usecases and tests along the way.
 
-
-
-
-I used the following init prompt to start the project and refine it with more usecases and tests along the way.
-
-```Init Prompt: I am planning to build a flashcards app. The app will allow the users to create their own flashcards, categorise them or use an AI Agent to create the custom flashcards by uploading the text as pdf. Then they can view the flashcards. Flashcards can have two sides: questions on one side and answer on the other. My front end technology can be ReactJS and Backend based on Python.. We can use sqllite db for now, but it should be extendable to other databases like postgres later. Also we need to add OpenAPI specs for the backend APIs. Let us create a plan to initialize a project based on these requirements.. ```
+```Initial Prompt: I am planning to build a flashcards app. The app will allow the users to create their own flashcards, categorise them or use an AI Agent to create the custom flashcards by uploading the text as pdf. Then they can view the flashcards. Flashcards can have two sides: questions on one side and answer on the other. My front end technology can be ReactJS and Backend based on Python.. We can use sqllite db for now, but it should be extendable to other databases like postgres later. Also we need to add OpenAPI specs for the backend APIs. Let us create a plan to initialize a project based on these requirements.. ```
 
 Later on, I used the AI coding assistant to generate the AI agent code for the flashcard generation from PDFs. I used the following prompt to generate the AI agent code.
 
@@ -72,3 +70,15 @@ Post that, used the below prompt for some mobile improvements.
 ```prompt: In the card deck, the icons have to be displayed on hover, or some kind of usability improvement so the mobile user can find the study session, delete, edit icons easily ```
 
 While doing all these, I made sure to prompt the AI assistant to include tests for all the new features as well. 
+
+Finally, I asked the AI coding assistant to use the MCP multi modal code reviewer tool to review the code and provide feedback. I used the following prompt: 
+
+```prompt:Use the MCP multi modal code reviewer tool to review the code and provide feedback.```
+
+This generated a report that can be found in the code_review_report.md file. The report contains the code review findings flagged as high severity, medium severity and low severity. Now, I asked the coding assistant to fix the high severity issues first. 
+
+```prompt: Fix the high severity issues first.```
+
+Of course there were some back and forths to achieve the expected results. When the conversation with the coding assistant got longer, it took a longer time to clearly fix the issues. I had to open a new context winndow and start with a new prompt. Other than that, the development of the application was super fast and seamless.
+
+

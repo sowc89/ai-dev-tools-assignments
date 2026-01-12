@@ -4,15 +4,24 @@ An intelligent flashcard application that helps students study more effectively.
 
 ## Features
 
+### Core Functionality
 - **Secure Authentication**: User registration and login powered by JWT (JSON Web Tokens) with extended 30-day sessions and automatic expiration handling.
 - **User Data Isolation**: Multi-user support ensuring users only see and manage their own flashcard decks and data.
-- **AI-Powered Generation**: Upload PDF documents to automatically generate flashcards using Google Gemini Flash.
 - **Smart Card Categorization**: Track your progress by categorizing cards into **New**, **Reviewing**, or **Mastered** with intuitive status badges.
 - **Deck Tagging & Organization**: Add custom tags to your decks for better organization and management.
 - **Real-Time Filtering**: Instantly find any deck by searching through names, descriptions, or tags using the intelligent search bar.
-- **Mobile-Optimized Interface**: A responsive UI with optimized touch targets and accessible action bars designed for seamless use on any device.
 - **Interactive Study Mode**: Focus on learning with flip animations, navigation controls, and organized card grouping.
-- **Feedback Loop**: Rate and refine AI-generated cards to improve quality and personal learning experience.
+
+### AI-Powered Features
+- **AI-Powered PDF Generation**: Upload PDF documents to automatically generate flashcards using Google Gemini Flash with intelligent text extraction.
+- **MCP-Based Architecture**: Utilizes Model Context Protocol (MCP) for efficient PDF processing, preventing LLM overload and enabling easy extensibility to other document formats.
+- **Smart Page Selection**: Extract flashcards from specific page ranges to focus on relevant content.
+- **Feedback Loop**: Review, rate, and refine AI-generated cards to improve quality and personalize your learning experience.
+- **File Size Guidance**: User-friendly warnings recommend keeping PDFs under 1MB for optimal performance.
+
+![App Screenshot](image.png)
+
+AGENT_WORKFLOW.md has the details of how the coding assistant and mcp tools assisted the project development workflow. 
 
 The app is deployed to Render and can be accessed at https://flashcard-ai-app.onrender.com
 
@@ -41,11 +50,7 @@ The app is deployed to Render and can be accessed at https://flashcard-ai-app.on
 - **CI/CD**: GitHub Actions (Automated testing & linting)
 
 
-![App Screenshot](image.png)
 
-AI Agent uses the MCP server to extract the pdf text. It is to avoid overloading the LLM with large pdfs. Also, later if another pdf extraction tool or documents of other formats have to be supported, it can be done easily by just changing the MCP server.
-
-AGENT_WORKFLOW.md has the details of how the coding assistant and mcp tools assisted the project development workflow. 
 
 ## Prerequisites
 
@@ -179,7 +184,7 @@ Both the backend and frontend have comprehensive test suites ensuring reliabilit
 - **Overall Coverage**: Tracked automatically in CI via `pytest-cov` and `vitest`.
 
 
-### Switching to PostgreSQL (Optional)
+## Switching to PostgreSQL (Optional)
 
 The application defaults to SQLite (`sqlite:///database.db`). To switch to PostgreSQL:
 

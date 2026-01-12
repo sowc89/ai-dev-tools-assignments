@@ -234,6 +234,9 @@ function DeckView() {
                                     onChange={(e) => setFile(e.target.files[0])}
                                     className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-100 file:text-emerald-700 hover:file:bg-emerald-200"
                                 />
+                                <p className="text-xs text-emerald-600 mt-1">
+                                    💡 For best results, keep PDF size under 1 MB
+                                </p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
