@@ -124,7 +124,7 @@ def get_or_create_tags(session: Session, tag_names: List[str]) -> List[Tag]:
 
 @app.post("/decks/", response_model=DeckRead)
 def create_deck(deck: DeckCreate, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
-    deck_data = deck.dict(exclude={"tags"})
+    deck_data = deck.model_dump(exclude={"tags"})
     db_deck = Deck(**deck_data)
     db_deck.user_id = current_user.id
     
@@ -154,7 +154,7 @@ def update_deck(deck_id: int, deck_update: DeckUpdate, session: Session = Depend
     if not db_deck:
         raise HTTPException(status_code=404, detail="Deck not found or no access")
     
-    deck_data = deck_update.dict(exclude_unset=True)
+    deck_data = deck_update.model_dump(exclude_unset=True)
     
     # Handle tags separately
     if "tags" in deck_data:
@@ -215,7 +215,7 @@ def update_card(card_id: int, card_update: CardUpdate, session: Session = Depend
     if not db_card:
         raise HTTPException(status_code=404, detail="Card not found or no access")
         
-    card_data = card_update.dict(exclude_unset=True)
+    card_data = card_update.model_dump(exclude_unset=True)
     for key, value in card_data.items():
         setattr(db_card, key, value)
         

@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import tempfile
 import google.generativeai as genai
 from typing import List, Tuple
@@ -8,6 +9,20 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 import base64
+
+def extract_json_from_response(text: str) -> str:
+    """Extract JSON from markdown code blocks or raw JSON."""
+    # Try to extract from markdown code blocks
+    json_match = re.search(r'```(?:json)?\s*(\[.*?\])\s*```', text, re.DOTALL)
+    if json_match:
+        return json_match.group(1)
+    
+    # Try to find raw JSON array
+    json_match = re.search(r'(\[.*?\])', text, re.DOTALL)
+    if json_match:
+        return json_match.group(1)
+    
+    return text.strip()
 
 class FlashcardAgent:
     def __init__(self):
@@ -34,10 +49,16 @@ class FlashcardAgent:
         
         # Save PDF to a temporary file for the MCP server to read
         # Using a temporary file is more efficient than passing large base64 strings
-        temp_pdf = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
-        temp_pdf.write(pdf_content)
-        temp_pdf_path = temp_pdf.name
-        temp_pdf.close()
+        temp_pdf_path = None  # Initialize to None for safer cleanup
+        try:
+            temp_pdf = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+            temp_pdf.write(pdf_content)
+            temp_pdf.flush()  # Ensure write completes
+            temp_pdf_path = temp_pdf.name
+            temp_pdf.close()
+        except Exception as e:
+            print(f"DEBUG: Failed to create temp file: {e}")
+            raise
         
         extracted_text = ""
         
@@ -88,7 +109,9 @@ class FlashcardAgent:
                     # Tool Execution Loop
                     while True:
                         # Check if response has parts and if the first part is a function call
-                        if not response.candidates[0].content.parts:
+                        # Add bounds checking to prevent IndexError
+                        if (not response.candidates or 
+                            not response.candidates[0].content.parts):
                             break
                         
                         part = response.candidates[0].content.parts[0]
@@ -135,12 +158,8 @@ class FlashcardAgent:
                             print(f"DEBUG: LLM requested unknown tool: {call.name}")
                             break
                     
-                    # Final response handling
-                    cleaned_response = response.text.strip()
-                    if cleaned_response.startswith("```json"):
-                        cleaned_response = cleaned_response[7:-3]
-                    elif cleaned_response.startswith("```"):
-                        cleaned_response = cleaned_response[3:-3]
+                    # Final response handling - use robust JSON extraction
+                    cleaned_response = extract_json_from_response(response.text)
                         
                     try:
                         cards_data = json.loads(cleaned_response)
@@ -161,17 +180,18 @@ class FlashcardAgent:
             traceback.print_exc()
             raise e
         finally:
-            # Clean up the temporary file
-            if 'temp_pdf_path' in locals() and os.path.exists(temp_pdf_path):
+            # Clean up the temporary file - improved cleanup logic
+            if temp_pdf_path is not None:
                 try:
-                    os.remove(temp_pdf_path)
-                    print(f"DEBUG: Cleaned up temporary PDF file: {temp_pdf_path}")
+                    if os.path.exists(temp_pdf_path):
+                        os.remove(temp_pdf_path)
+                        print(f"DEBUG: Cleaned up temporary PDF file: {temp_pdf_path}")
                 except Exception as cleanup_err:
                     print(f"DEBUG: Failed to cleanup temp file: {cleanup_err}")
 
     async def refine_flashcards(self, current_cards: List[CardCreate], source_text: str, feedback: str) -> List[CardCreate]:
         # Serialize current cards to JSON for the prompt
-        cards_json = json.dumps([c.dict() for c in current_cards])
+        cards_json = json.dumps([c.model_dump() for c in current_cards])
         
         system_instruction = f"""
         You are a helpful assistant assisting a student with flashcards.
@@ -195,11 +215,8 @@ class FlashcardAgent:
         try:
             response = self.model.generate_content(system_instruction)
             
-            cleaned_response = response.text.strip()
-            if cleaned_response.startswith("```json"):
-                cleaned_response = cleaned_response[7:-3]
-            elif cleaned_response.startswith("```"):
-                cleaned_response = cleaned_response[3:-3]
+            # Use robust JSON extraction
+            cleaned_response = extract_json_from_response(response.text)
                 
             cards_data = json.loads(cleaned_response)
             
